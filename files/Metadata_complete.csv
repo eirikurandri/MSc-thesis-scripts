@@ -1,0 +1,186 @@
+Sample_ID,demultiplexing_ID,lab_sample_name,Thesis_name,Sample_type,Fish_type,Qubit,Sample_or_control,experi,Eviro,Batch,Tank_s,Sex_approx,striped_spotted,Blank_Type,Water condition,Individ
+PRI.TKENJ.2ALF001_S3_L001_R1_001.fastq.gz,2ALF001,2ALF-001,,faeces,Albino,0.192,sample,Tyr,No,2,23,,,,medium,
+PRI.TKENJ.2ALF002_S17_L001_R1_001.fastq.gz,2ALF002,2ALF-002,,faeces,Albino,0.456,sample,Tyr,No,2,23,,,,medium,
+PRI.TKENJ.2ALF003_S10_L001_R1_001.fastq.gz,2ALF003,2ALF-003,,faeces,Albino,0.154,sample,Tyr,No,2,23,,,,medium,
+PRI.TKENJ.2MOF001_S14_L001_R1_001.fastq.gz,2MOF001,2MOF-001,,faeces,Mosaic,1.39,sample,Tyr,No,2,25,,,,medium,
+PRI.TKENJ.2MOF002_S2_L001_R1_001.fastq.gz,2MOF002,2MOF-002,,faeces,Mosaic,0.462,sample,Tyr,No,2,25,,,,medium,
+PRI.TKENJ.2MOF003_S1_L001_R1_001.fastq.gz,2MOF003,2MOF-003,,faeces,Mosaic,0.198,sample,Tyr,No,2,25,,,,medium,
+PRI.TKENJ.2MOF004_S16_L001_R1_001.fastq.gz,2MOF004,2MOF-004,,faeces,Mosaic,0.122,sample,Tyr,No,2,25,,,,medium,
+PRI.TKENJ.2MOF005_S4_L001_R1_001.fastq.gz,2MOF005,2MOF-005,,faeces,Mosaic,0.01,sample,Tyr,No,2,25,,,,medium,
+PRI.TKENJ.2WTF001_S6_L001_R1_001.fastq.gz,2WTF001,2WTF-001,,faeces,WT,0.256,sample,Tyr,No,2,24,,,,medium,
+PRI.TKENJ.2WTF002_S7_L001_R1_001.fastq.gz,2WTF002,2WTF-002,,faeces,WT,0.3,sample,Tyr,No,2,24,,,,medium,
+PRI.TKENJ.2WTF003_S13_L001_R1_001.fastq.gz,2WTF003,2WTF-003,,faeces,WT,0.084,sample,Tyr,No,2,24,,,,medium,
+PRI.TKENJ.2WTF004_S8_L001_R1_001.fastq.gz,2WTF004,2WTF-004,,faeces,WT,0.351,sample,Tyr,No,2,24,,,,medium,
+PRI.TKENJ.ALW001_S71_L001_R1_001.fastq.gz,ALW001,ALW-001,,water,Albino,0.128,sample,Tyr,Yes,2,23,,,,medium,
+PRI.TKENJ.Blankother1_S74_L001_R1_001.fastq.gz,Blankother1,PCR blank 1,,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.Blankother2_S80_L001_R1_001.fastq.gz,Blankother2,PCR blank 3,,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.Blankother3_S81_L001_R1_001.fastq.gz,Blankother3,PCR blank 4,,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.DrAL001g_S33_L001_R1_001.fastq.gz,Dr AL001g,Dr. AL-001g,,gut,Albino,39.5,sample,Tyr,No,2,23,,,,medium,1A
+PRI.TKENJ.DrAL001s_S50_L001_R1_001.fastq.gz,DrAL001s,Dr. AL-001s,,skin_swab,Albino,0.76,sample,Tyr,No,2,23,,,,medium,1A
+PRI.TKENJ.DrAL001t_S64_L001_R1_001.fastq.gz,DrAL001t,Dr. AL-001t,,tail_fin,Albino,12.2,sample,Tyr,No,2,23,,,,medium,1A
+PRI.TKENJ.DrAL002g_S36_L001_R1_001.fastq.gz,Dr AL002g,Dr. AL-002g,,gut,Albino,25.2,sample,Tyr,No,2,23,,,,medium,2A
+PRI.TKENJ.DrAL002s_S45_L001_R1_001.fastq.gz,DrAL002s,Dr. AL-002s,,skin_swab,Albino,1.19,sample,Tyr,No,2,23,,,,medium,2A
+PRI.TKENJ.DrAL002t_S56_L001_R1_001.fastq.gz,DrAL002t,Dr. AL-002t,,tail_fin,Albino,15.5,sample,Tyr,No,2,23,,,,medium,2A
+PRI.TKENJ.DrAL003g_S37_L001_R1_001.fastq.gz,Dr AL003g,Dr. AL-003g,,gut,Albino,17.3,sample,Tyr,No,2,23,,,,medium,3A
+PRI.TKENJ.DrAL003s_S52_L001_R1_001.fastq.gz,DrAL003s,Dr. AL-003s,,skin_swab,Albino,1.06,sample,Tyr,No,2,23,,,,medium,3A
+PRI.TKENJ.DrAL003t_S58_L001_R1_001.fastq.gz,DrAL003t,Dr. AL-003t,,tail_fin,Albino,23.8,sample,Tyr,No,2,23,,,,medium,3A
+PRI.TKENJ.DrAL004g_S32_L001_R1_001.fastq.gz,Dr AL004g,Dr. AL-004g,,gut,Albino,51,sample,Tyr,No,2,23,,,,medium,4A
+PRI.TKENJ.DrAL004s_S49_L001_R1_001.fastq.gz,DrAL004s,Dr. AL-004s,,skin_swab,Albino,2.57,sample,Tyr,No,2,23,,,,medium,4A
+PRI.TKENJ.DrAL004t_S65_L001_R1_001.fastq.gz,DrAL004t,Dr. AL-004t,,tail_fin,Albino,14,sample,Tyr,No,2,23,,,,medium,4A
+PRI.TKENJ.DrLAL001_S28_L001_R1_001.fastq.gz,DrLAL001,Dr.LAL-001,,larvae,Albino,10.4,sample,Tyr,No,2,,,,,,
+PRI.TKENJ.DrLAL002_S25_L001_R1_001.fastq.gz,DrLAL002,Dr.LAL-002,,larvae,Albino,6.76,sample,Tyr,No,2,,,,,,
+PRI.TKENJ.DrLAL003_S20_L001_R1_001.fastq.gz,DrLAL003,Dr.LAL-003,,larvae,Albino,18.1,sample,Tyr,No,2,,,,,,
+PRI.TKENJ.DrLIRF8001_S30_L001_R1_001.fastq.gz,DrLIRF8001,Dr.LIRF8-001,,larvae,IRF8,16.4,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.DrLIRF8002_S21_L001_R1_001.fastq.gz,DrLIRF8002,Dr.LIRF8-002,,larvae,IRF8,19.5,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.DrLIRF8003_S23_L001_R1_001.fastq.gz,DrLIRF8003,Dr.LIRF8-003,,larvae,IRF8,33.7,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.DrLIRF8C001_S29_L001_R1_001.fastq.gz,DrLIRF8C001,Dr. LIRF8C-001,,larvae,IRF8_control,17,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.DrLIRF8C002_S22_L001_R1_001.fastq.gz,DrLIRF8C002,Dr. LIRF8C-002,,larvae,IRF8_control,18.5,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.DrLIRF8C003_S26_L001_R1_001.fastq.gz,DrLIRF8C003,Dr. LIRF8C-003,,larvae,IRF8_control,7.71,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.DrLWT001_S27_L001_R1_001.fastq.gz,DrLWT001,Dr.LWT-001,,larvae,WT,12.5,sample,Tyr,No,2,,,,,,
+PRI.TKENJ.DrLWT002_S19_L001_R1_001.fastq.gz,DrLWT002,Dr.LWT-002,,larvae,WT,10.8,sample,Tyr,No,2,,,,,,
+PRI.TKENJ.DrLWT003_S24_L001_R1_001.fastq.gz,DrLWT003,Dr.LWT-003,,larvae,WT,35.7,sample,Tyr,No,2,,,,,,
+PRI.TKENJ.DrMO001g_S35_L001_R1_001.fastq.gz,DrMO001g,Dr.MO-001g,,gut,Mosaic,15.8,sample,Tyr,No,2,25,,,,medium,1M
+PRI.TKENJ.DrMO001s_S48_L001_R1_001.fastq.gz,DrMO001s,Dr.MO-001s,,skin_swab,Mosaic,0.362,sample,Tyr,No,2,25,,,,medium,1M
+PRI.TKENJ.DrMO001t_S59_L001_R1_001.fastq.gz,DrMO001t,Dr.MO-001t,,tail_fin,Mosaic,12.4,sample,Tyr,No,2,25,,,,medium,1M
+PRI.TKENJ.DrMO002g_S31_L001_R1_001.fastq.gz,DrMO002g,Dr.MO-002g,,gut,Mosaic,32.6,sample,Tyr,No,2,25,,,,medium,2M
+PRI.TKENJ.DrMO002s_S47_L001_R1_001.fastq.gz,DrMO002s,Dr.MO-002s,,skin_swab,Mosaic,1.39,sample,Tyr,No,2,25,,,,medium,2M
+PRI.TKENJ.DrMO002t_S60_L001_R1_001.fastq.gz,DrMO002t,Dr.MO-002t,,tail_fin,Mosaic,20.2,sample,Tyr,No,2,25,,,,medium,2M
+PRI.TKENJ.DrMO003g_S34_L001_R1_001.fastq.gz,DrMO003g,Dr.MO-003g,,gut,Mosaic,10.7,sample,Tyr,No,2,25,,,,medium,3M
+PRI.TKENJ.DrMO003s_S46_L001_R1_001.fastq.gz,DrMO003s,Dr.MO-003s,,skin_swab,Mosaic,1.85,sample,Tyr,No,2,25,,,,medium,3M
+PRI.TKENJ.DrMO003t_S55_L001_R1_001.fastq.gz,DrMO003t,Dr.MO-003t,,tail_fin,Mosaic,44.7,sample,Tyr,No,2,25,,,,medium,3M
+PRI.TKENJ.DrMO004g_S38_L001_R1_001.fastq.gz,DrMO004g,Dr.MO-004g,,gut,Mosaic,24.2,sample,Tyr,No,2,25,,,,medium,4M
+PRI.TKENJ.DrMO004s_S44_L001_R1_001.fastq.gz,DrMO004s,Dr.MO-004s,,skin_swab,Mosaic,2.95,sample,Tyr,No,2,25,,,,medium,4M
+PRI.TKENJ.DrMO004t_S62_L001_R1_001.fastq.gz,DrMO004t,Dr.MO-004t,,tail_fin,Mosaic,20.4,sample,Tyr,No,2,25,,,,medium,4M
+PRI.TKENJ.DrWT001g_S42_L001_R1_001.fastq.gz,DrWT001g,Dr. WT-001g,,gut,WT,18.4,sample,Tyr,No,2,24,,,,medium,1W
+PRI.TKENJ.DrWT001s_S54_L001_R1_001.fastq.gz,DrWT001s,Dr. WT-001s,,skin_swab,WT,0.992,sample,Tyr,No,2,24,,,,medium,1W
+PRI.TKENJ.DrWT001t_S63_L001_R1_001.fastq.gz,DrWT001t,Dr. WT-001t,,tail_fin,WT,15.8,sample,Tyr,No,2,24,,,,medium,1W
+PRI.TKENJ.DrWT002g_S41_L001_R1_001.fastq.gz,DrWT002g,Dr. WT-002g,,gut,WT,46,sample,Tyr,No,2,24,,,,medium,2W
+PRI.TKENJ.DrWT002s_S53_L001_R1_001.fastq.gz,DrWT002s,Dr. WT-002s,,skin_swab,WT,0.161,sample,Tyr,No,2,24,,,,medium,2W
+PRI.TKENJ.DrWT002t_S57_L001_R1_001.fastq.gz,DrWT002t,Dr. WT-002t,,tail_fin,WT,24.9,sample,Tyr,No,2,24,,,,medium,2W
+PRI.TKENJ.DrWT003g_S39_L001_R1_001.fastq.gz,DrWT003g,Dr. WT-003g,,gut,WT,31,sample,Tyr,No,2,24,,,,medium,3W
+PRI.TKENJ.DrWT003s_S43_L001_R1_001.fastq.gz,DrWT003s,Dr. WT-003s,,skin_swab,WT,2.01,sample,Tyr,No,2,24,,,,medium,3W
+PRI.TKENJ.DrWT003t_S61_L001_R1_001.fastq.gz,DrWT003t,Dr. WT-003t,,tail_fin,WT,19.4,sample,Tyr,No,2,24,,,,medium,3W
+PRI.TKENJ.DrWT004g_S40_L001_R1_001.fastq.gz,DrWT004g,Dr. WT-004g,,gut,WT,32.2,sample,Tyr,No,2,24,,,,medium,4W
+PRI.TKENJ.DrWT004s_S51_L001_R1_001.fastq.gz,DrWT004s,Dr. WT-004s,,skin_swab,WT,1.41,sample,Tyr,No,2,24,,,,medium,4W
+PRI.TKENJ.DrWT004t_S66_L001_R1_001.fastq.gz,DrWT004t,Dr. WT-004t,,tail_fin,WT,14.2,sample,Tyr,No,2,24,,,,medium,4W
+PRI.TKENJ.Extractionblank1_S73_L001_R1_001.fastq.gz,Extractionblank1,Extraction blank 1,EB1-R2,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.Extractionblank2_S75_L001_R1_001.fastq.gz,Extractionblank2,Extraction blank 2,EB2-R2,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.Extractionblank3_S76_L001_R1_001.fastq.gz,Extractionblank3,Extraction blank 3,EB3-R2 ,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.Extractionblank4_S82_L001_R1_001.fastq.gz,Extractionblank4,Extraction blank 4,EB4-R2,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.Extractionblank5_S83_L001_R1_001.fastq.gz,Extractionblank5,Extraction blank 5,EB5-R2,blank,,0.01,control,,No,2,,,,Extraction,,
+PRI.TKENJ.MOW001_S70_L001_R1_001.fastq.gz,MOW001,MOW-001,,water,Mosaic,0.01,sample,Tyr,Yes,2,25,,,,medium,
+PRI.TKENJ.PCR27blank1PCR1_S77_L001_R1_001.fastq.gz,PCR27blank1PCR1,PCR_blank1_PCR2,PCR2a-R2,blank,,0.01,control,,No,2,,,,PCR1,,
+PRI.TKENJ.PCR27blank2PCR1_S78_L001_R1_001.fastq.gz,PCR27blank2PCR1,PCR_blank2_PCR2,PCR2b-R2,blank,,0.01,control,,No,2,,,,PCR1,,
+PRI.TKENJ.PCR37blank1PCR1_S84_L001_R1_001.fastq.gz,PCR37blank1PCR1,PCR_blank3_PCR2,PCR2c-R2,blank,,0.01,control,,No,2,,,,PCR1,,
+PRI.TKENJ.PCR37blank2PCR1_S85_L001_R1_001.fastq.gz,PCR37blank2PCR1,PCR27_blank1_PCR1,PCR1a-R2,blank,,0.01,control,,No,2,,,,PCR1,,
+PRI.TKENJ.PCRblank1PCR2_S86_L001_R1_001.fastq.gz,PCRblank1PCR2,PCR27_blank2_PCR1,PCR1b-R2,blank,,0.01,control,,No,2,,,,PCR2,,
+PRI.TKENJ.PCRblank2PCR2_S87_L001_R1_001.fastq.gz,PCRblank2PCR2,PCR37_blank1_PCR1,PCR1c-R2,blank,,0.01,control,,No,2,,,,PCR2,,
+PRI.TKENJ.PCRblank3PCR2_S88_L001_R1_001.fastq.gz,PCRblank3PCR2,PCR37_blank2_PCR1,PCR1d-R2,blank,,0.01,control,,No,2,,,,PCR2,,
+PRI.TKENJ.Positivecontrol27PCR1_S72_L001_R1_001.fastq.gz,Positive control27PCR1,Positive control_37PCR1,,positive_control,,0.01,control,,No,2,,,,,,
+PRI.TKENJ.Positivecontrol37PCR1_S79_L001_R1_001.fastq.gz,Positive control37PCR1,Positive control-27PCR1,,positive_control,,0.01,control,,No,2,,,,,,
+PRI.TKENJ.WTW001_S68_L001_R1_001.fastq.gz,WTW001,WTW-001,,water,WT,0.01,sample,Tyr,Yes,2,24,,,,medium,
+PRI.TKENJ.YIRF8CF001_S11_L001_R1_001.fastq.gz,YIRF8CF001,YIRF8CF-001,,faeces,IRF8_control_youth,0.439,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.YIRF8CF002_S9_L001_R1_001.fastq.gz,YIRF8CF002,YIRF8CF-002,,faeces,IRF8_control_youth,0.143,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.YIRF8CF003_S15_L001_R1_001.fastq.gz,YIRF8CF003,YIRF8CF-003,,faeces,IRF8_control_youth,0.261,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.YIRF8CW001_S67_L001_R1_001.fastq.gz,YIRF8CW001,YIRF8CW-001,,water,IRF8_control_youth,0.01,sample,IRF8,Yes,2,,,,,,
+PRI.TKENJ.YIRF8F001_S5_L001_R1_001.fastq.gz,YIRF8F001,YIRF8F-001,,faeces,IRF8_youth,0.394,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.YIRF8F002_S12_L001_R1_001.fastq.gz,YIRF8F002,YIRF8F-002,,faeces,IRF8_youth,0.657,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.YIRF8F003_S18_L001_R1_001.fastq.gz,YIRF8F003,YIRF8F-003,,faeces,IRF8_youth,0.589,sample,IRF8,No,2,,,,,,
+PRI.TKENJ.YIRF8W001_S69_L001_R1_001.fastq.gz,YIRF8W001,YIRF8W-001,,water,IRF8_youth,0.061,sample,IRF8,Yes,2,,,,,,
+PRI.AKILJ.Aa_S83_L001_R1_001.fastq.gz,A(a),A(a),,artemia,,19.7,sample,,Yes,1,,,,,,
+PRI.AKILJ.Al001A_S3_L001_R1_001.fastq.gz,Al-001A,Al-001,,tail_fin,Albino,25.6,sample,Tyr,No,1,23,M,Striped,,high,
+PRI.AKILJ.Al001B_S17_L001_R1_001.fastq.gz,Al-001B,Al-001,,tail_fin,Albino,9.56,sample,Tyr,No,1,23,M,Striped,,high,
+PRI.AKILJ.Al002A_S30_L001_R1_001.fastq.gz,Al-002A,Al-002,,tail_fin,Albino,19.9,sample,Tyr,No,1,23,F,Striped,,high,
+PRI.AKILJ.Al002B_S44_L001_R1_001.fastq.gz,Al-002B,Al-002,,tail_fin,Albino,1.22,sample,Tyr,No,1,23,F,Striped,,high,
+PRI.AKILJ.Al003A_S14_L001_R1_001.fastq.gz,Al-003A,Al-003,,tail_fin,Albino,33.5,sample,Tyr,No,1,23,F,Striped,,high,
+PRI.AKILJ.Al003B_S19_L001_R1_001.fastq.gz,Al-003B,Al-003,,tail_fin,Albino,5.51,sample,Tyr,No,1,23,F,Striped,,high,
+PRI.AKILJ.Al004A_S10_L001_R1_001.fastq.gz,Al-004A,Al-004,,tail_fin,Albino,32.9,sample,Tyr,No,1,23,F,Striped,,high,
+PRI.AKILJ.Al004B_S56_L001_R1_001.fastq.gz,Al-004B,Al-004,,tail_fin,Albino,25.4,sample,Tyr,No,1,23,F,Striped,,high,
+PRI.AKILJ.AlF001_S88_L001_R1_001.fastq.gz,AlF-001,AlF-001,,faeces,Albino,4.48,sample,Tyr,No,1,23,,,,low,
+PRI.AKILJ.AlF002_S89_L001_R1_001.fastq.gz,AlF-002,AlF-002,,faeces,Albino,6.49,sample,Tyr,No,1,23,,,,low,
+PRI.AKILJ.AlF003_S96_L001_R1_001.fastq.gz,AlF-003,AlF-003,,faeces,Albino,4.41,sample,Tyr,No,1,23,,,,low,
+PRI.AKILJ.AlF004_S87_L001_R1_001.fastq.gz,AlF-004,AlF-004,,faeces,Albino,13.3,sample,Tyr,No,1,23,,,,low,
+PRI.AKILJ.AlF005_S76_L001_R1_001.fastq.gz,AlF-005,AlF-005,,faeces,Albino,1.98,sample,Tyr,No,1,23,,,,low,
+PRI.AKILJ.AlT1001A_S1_L001_R1_001.fastq.gz,AlT1-001A,AlT1-001,,faeces,Albino,0.931,sample,Tyr,No,1,23,,,,high,
+PRI.AKILJ.AlT1001B_S40_L001_R1_001.fastq.gz,AlT1-001B,AlT1-001,,faeces,Albino,0.431,sample,Tyr,No,1,23,,,,high,
+PRI.AKILJ.Ba_S94_L001_R1_001.fastq.gz,B(a),B(a),,artemia,,46.3,sample,,Yes,1,,,,,,
+PRI.AKILJ.Blank1_S77_L001_R1_001.fastq.gz,Blank1,Blank1,EB1-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank10_S68_L001_R1_001.fastq.gz,Blank10,Blank10,EB10-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank11_S69_L001_R1_001.fastq.gz,Blank11,Blank11,EB11-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank12_S79_L001_R1_001.fastq.gz,Blank12,Blank2,EB12-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank13_S92_L001_R1_001.fastq.gz,Blank13,Blank3,EB13-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank2_S47_L001_R1_001.fastq.gz,Blank2,Blank2,EB2-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank3_S26_L001_R1_001.fastq.gz,Blank3,Blank3,EB3-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank4_S32_L001_R1_001.fastq.gz,Blank4,Blank4,EB4-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank5_S16_L001_R1_001.fastq.gz,Blank5,Blank5,EB5-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank6_S27_L001_R1_001.fastq.gz,Blank6,Blank6,EB6-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank7_S39_L001_R1_001.fastq.gz,Blank7,Blank7,EB7-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Blank8_S60_L001_R1_001.fastq.gz,Blank8,Blank8,EB8-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.blank9_S66_L001_R1_001.fastq.gz,blank9,Blank9,EB9-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.Ca_S75_L001_R1_001.fastq.gz,C(a),C(a),,artemia,,15.5,sample,,Yes,1,,,,,,
+PRI.AKILJ.Extractionshieldblank_S65_L001_R1_001.fastq.gz,extraction shield blank,Shield blank,EB-R1,blank,,0.01,control,,No,1,,,,Extraction,,
+PRI.AKILJ.FsA_S36_L001_R1_001.fastq.gz,FsA,A,,Feed,,3.75,sample,,Yes,1,,,,,,
+PRI.AKILJ.FsB_S29_L001_R1_001.fastq.gz,FsB,B,,Feed,,3.08,sample,,Yes,1,,,,,,
+PRI.AKILJ.FsC_S22_L001_R1_001.fastq.gz,FsC,C,,Feed,,4.92,sample,,Yes,1,,,,,,
+PRI.AKILJ.Mo001_S50_L001_R1_001.fastq.gz,Mo-001,Mo-001,,tail_fin,Mosaic,22.4,sample,Tyr,No,1,25,F,Striped,,high,
+PRI.AKILJ.Mo002_S11_L001_R1_001.fastq.gz,Mo-002,Mo-002,,tail_fin,Mosaic,24.1,sample,Tyr,No,1,25,F,Striped,,high,
+PRI.AKILJ.Mo003_S25_L001_R1_001.fastq.gz,Mo-003,Mo-003,,tail_fin,Mosaic,30.4,sample,Tyr,No,1,25,M,Striped,,high,
+PRI.AKILJ.Mo004_S53_L001_R1_001.fastq.gz,Mo-004,Mo-004,,tail_fin,Mosaic,27.7,sample,Tyr,No,1,25,M,Striped,,high,
+PRI.AKILJ.Mo005_S72_L001_R1_001.fastq.gz,Mo-005,Mo-005,,tail_fin,Mosaic,36,sample,Tyr,No,1,25,M,Striped,,high,
+PRI.AKILJ.Mo006_S13_L001_R1_001.fastq.gz,Mo-006,Mo-006,,tail_fin,Mosaic,19,sample,Tyr,No,1,26,F,Striped,,high,
+PRI.AKILJ.Mo007_S6_L001_R1_001.fastq.gz,Mo-007,Mo-007,,tail_fin,Mosaic,36.9,sample,Tyr,No,1,26,F,Striped,,high,
+PRI.AKILJ.Mo008_S59_L001_R1_001.fastq.gz,Mo-008,Mo-008,,tail_fin,Mosaic,0.305,sample,Tyr,No,1,26,M,Striped,,high,
+PRI.AKILJ.Mo009_S49_L001_R1_001.fastq.gz,Mo-009,Mo-009,,tail_fin,Mosaic,26.7,sample,Tyr,No,1,26,F,Striped,,high,
+PRI.AKILJ.Mo010_S24_L001_R1_001.fastq.gz,Mo-010,Mo-010,,tail_fin,Mosaic,47.2,sample,Tyr,No,1,26,F,Striped,,high,
+PRI.AKILJ.Mo011_S12_L001_R1_001.fastq.gz,Mo-011,Mo-011,,tail_fin,Mosaic,0.01,sample,Tyr,No,1,26,F,Striped,,high,
+PRI.AKILJ.Mo012_S5_L001_R1_001.fastq.gz,Mo-012,Mo-012,,tail_fin,Mosaic,54,sample,Tyr,No,1,28,M,Striped,,high,
+PRI.AKILJ.Mo013_S48_L001_R1_001.fastq.gz,Mo-013,Mo-013,,tail_fin,Mosaic,24.4,sample,Tyr,No,1,28,M,Spotted,,high,
+PRI.AKILJ.Mo014_S8_L001_R1_001.fastq.gz,Mo-014,Mo-014,,tail_fin,Mosaic,46.1,sample,Tyr,No,1,28,M,Spotted,,high,
+PRI.AKILJ.Mo014CR_S102_L001_R1_001.fastq.gz,Mo-014CR,Mo-014CR,,,,0.01,sample,,No,1,,,,,,
+PRI.AKILJ.Mo015_S54_L001_R1_001.fastq.gz,Mo-015,Mo-015,,tail_fin,Mosaic,38.1,sample,Tyr,No,1,28,M,Striped,,high,
+PRI.AKILJ.Mo016_S64_L001_R1_001.fastq.gz,Mo-016,Mo-016,,tail_fin,Mosaic,23.1,sample,Tyr,No,1,28,F,Spotted,,high,
+PRI.AKILJ.Mo017_S57_L001_R1_001.fastq.gz,Mo-017,Mo-017,,tail_fin,Mosaic,31,sample,Tyr,No,1,28,F?,Spotted,,high,
+PRI.AKILJ.Mo018_S28_L001_R1_001.fastq.gz,Mo-018,Mo-018,,tail_fin,Mosaic,42.7,sample,Tyr,No,1,28,F,Striped,,high,
+PRI.AKILJ.Mo019_S41_L001_R1_001.fastq.gz,Mo-019,Mo-019,,tail_fin,Mosaic,19,sample,Tyr,No,1,28,M,Striped,,high,
+PRI.AKILJ.Mo020_S62_L001_R1_001.fastq.gz,Mo-020,Mo-020,,tail_fin,Mosaic,53,sample,Tyr,No,1,28,M,Spotted,,high,
+PRI.AKILJ.MOF001_S74_L001_R1_001.fastq.gz,MOF-001,MOF-001,,faeces,Mosaic,10.2,sample,Tyr,No,1,26,,,,low,
+PRI.AKILJ.MOF002_S86_L001_R1_001.fastq.gz,MOF-002,MOF-002,,faeces,Mosaic,18.9,sample,Tyr,No,1,26,,,,low,
+PRI.AKILJ.MOF003_S85_L001_R1_001.fastq.gz,MOF-003,MOF-003,,faeces,Mosaic,17.6,sample,Tyr,No,1,26,,,,low,
+PRI.AKILJ.MOF004_S82_L001_R1_001.fastq.gz,MOF-004,MOF-004,,faeces,Mosaic,13.8,sample,Tyr,No,1,26,,,,low,
+PRI.AKILJ.MOF005_S80_L001_R1_001.fastq.gz,MOF-005,MOF-005,,faeces,Mosaic,6.32,sample,Tyr,No,1,26,,,,low,
+PRI.AKILJ.MoT1001A_S7_L001_R1_001.fastq.gz,MoT1-001A,MoT1-001,,faeces,Mosaic,1.46,sample,Tyr,No,1,"25,26,28",,,,high,
+PRI.AKILJ.MoT1001B_S58_L001_R1_001.fastq.gz,MoT1-001B,MoT1-001,,faeces,Mosaic,0.372,sample,Tyr,No,1,"25,26,28",,,,high,
+PRI.AKILJ.Positivecontrol_S15_L001_R1_001.fastq.gz,positive,Blank1,,positive_control,,0.01,sample,,No,1,,,,,,
+PRI.AKILJ.WsA_S18_L001_R1_001.fastq.gz,WsA,A,,water,WT,0.34,sample,Tyr,Yes,1,,,,,high,
+PRI.AKILJ.WsA2_S81_L001_R1_001.fastq.gz,WsA2,A2,,water,WT,0.663,sample,Tyr,Yes,1,24,,,,low,
+PRI.AKILJ.WsB_S2_L001_R1_001.fastq.gz,WsB,B,,water,Albino,0.464,sample,Tyr,Yes,1,,,,,high,
+PRI.AKILJ.WsB2_S84_L001_R1_001.fastq.gz,WsB2,B2,,water,Albino,2.71,sample,Tyr,Yes,1,23,,,,low,
+PRI.AKILJ.WsC_S51_L001_R1_001.fastq.gz,WsC,C,,water,Mosaic,0.308,sample,Tyr,Yes,1,,,,,high,
+PRI.AKILJ.WsC2_S90_L001_R1_001.fastq.gz,WsC2,C2,,water,Mosaic,1.4,sample,Tyr,Yes,1,26,,,,low,
+PRI.AKILJ.WT001_S46_L001_R1_001.fastq.gz,WT-001,WT-001,,tail_fin,WT,24.7,sample,Tyr,No,1,24,F,Striped,,high,
+PRI.AKILJ.WT002_S63_L001_R1_001.fastq.gz,WT-002,WT-002,,tail_fin,WT,27,sample,Tyr,No,1,24,M,Striped,,high,
+PRI.AKILJ.WT003_S67_L001_R1_001.fastq.gz,WT-003,WT-003,,tail_fin,WT,23.5,sample,Tyr,No,1,24,F?,Striped,,high,
+PRI.AKILJ.WT004_S4_L001_R1_001.fastq.gz,WT-004,WT-004,,tail_fin,WT,17.8,sample,Tyr,No,1,24,F,Striped,,high,
+PRI.AKILJ.WT005_S21_L001_R1_001.fastq.gz,WT-005,WT-005,,tail_fin,WT,14.5,sample,Tyr,No,1,24,M,Striped,,high,
+PRI.AKILJ.WT006_S37_L001_R1_001.fastq.gz,WT-006,WT-006,,tail_fin,WT,24.9,sample,Tyr,No,1,24,M,Striped,,high,
+PRI.AKILJ.WT007_S38_L001_R1_001.fastq.gz,WT-007,WT-007,,tail_fin,WT,19.6,sample,Tyr,No,1,24,F,Striped,,high,
+PRI.AKILJ.WT008_S70_L001_R1_001.fastq.gz,WT-008,WT-008,,tail_fin,WT,19.4,sample,Tyr,No,1,24,F,Striped,,high,
+PRI.AKILJ.WT009_S35_L001_R1_001.fastq.gz,WT-009,WT-009,,tail_fin,WT,29.3,sample,Tyr,No,1,24,M,Striped,,high,
+PRI.AKILJ.WT010_S20_L001_R1_001.fastq.gz,WT-010,WT-010,,tail_fin,WT,12.3,sample,Tyr,No,1,24,F,Striped,,high,
+PRI.AKILJ.WT011_S23_L001_R1_001.fastq.gz,WT-011,WT-011,,tail_fin,WT,18.9,sample,Tyr,No,1,27,F,Striped,,high,
+PRI.AKILJ.WT012_S31_L001_R1_001.fastq.gz,WT-012,WT-012,,tail_fin,WT,30.3,sample,Tyr,No,1,27,F,Striped,,high,
+PRI.AKILJ.WT013_S34_L001_R1_001.fastq.gz,WT-013,WT-013,,tail_fin,WT,35.4,sample,Tyr,No,1,27,F,Striped,,high,
+PRI.AKILJ.WT014_S55_L001_R1_001.fastq.gz,WT-014,WT-014,,tail_fin,WT,15.8,sample,Tyr,No,1,27,F?,Striped,,high,
+PRI.AKILJ.WT015_S42_L001_R1_001.fastq.gz,WT-015,WT-015,,tail_fin,WT,7.59,sample,Tyr,No,1,27,M,Striped,,high,
+PRI.AKILJ.WT016_S52_L001_R1_001.fastq.gz,WT-016,WT-016,,tail_fin,WT,25.7,sample,Tyr,No,1,27,M,Striped,,high,
+PRI.AKILJ.WT017_S43_L001_R1_001.fastq.gz,WT-017,WT-017,,tail_fin,WT,22.8,sample,Tyr,No,1,27,F,Striped,,high,
+PRI.AKILJ.WT018_S9_L001_R1_001.fastq.gz,WT-018,WT-018,,tail_fin,WT,21.8,sample,Tyr,No,1,27,F,Striped,,high,
+PRI.AKILJ.WT019_S71_L001_R1_001.fastq.gz,WT-019,WT-019,,tail_fin,WT,23.7,sample,Tyr,No,1,27,M,Striped,,high,
+PRI.AKILJ.WT020_S45_L001_R1_001.fastq.gz,WT-020,WT-020,,tail_fin,WT,22.3,sample,Tyr,No,1,27,F,Striped,,high,
+PRI.AKILJ.WTF001_S91_L001_R1_001.fastq.gz,WTF-001,WTF-001,,faeces,WT,1.24,sample,Tyr,No,1,24,,,,low,
+PRI.AKILJ.WTF002_S73_L001_R1_001.fastq.gz,WTF-002,WTF-002,,faeces,WT,0.994,sample,Tyr,No,1,24,,,,low,
+PRI.AKILJ.WTF003_S95_L001_R1_001.fastq.gz,WTF-003,WTF-003,,faeces,WT,0.755,sample,Tyr,No,1,24,,,,low,
+PRI.AKILJ.WTF004_S78_L001_R1_001.fastq.gz,WTF-004,WTF-004,,faeces,WT,1.41,sample,Tyr,No,1,24,,,,low,
+PRI.AKILJ.WTF005_S93_L001_R1_001.fastq.gz,WTF-005,WTF-005,,faeces,WT,0.99,sample,Tyr,No,1,24,,,,low,
+PRI.AKILJ.WTT1001A_S33_L001_R1_001.fastq.gz,WTT1-001A,WTT1-001,,faeces,WT,1.22,sample,Tyr,No,1,"24, 27",,,,high,
+PRI.AKILJ.WTT1001B_S61_L001_R1_001.fastq.gz,WTT1-001B,WTT1-001,,faeces,WT,0.883,sample,Tyr,No,1,"24, 27",,,,high,
