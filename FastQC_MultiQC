@@ -1,0 +1,23 @@
+#running fastQC and MultiQC
+
+#1 laod and run fastQC
+
+module load java fastqc/0.11.8
+cd $raw_data/$SAMPLE # location of your data
+file=`ls -a *fq.gz | sort` #  specify whatever the inputs you have
+fastqc $file -o $out_direc/2_fastqc_before/$SAMPLE
+
+#2Then split the fastQC reports into subdirectories with forward and reverse reads sperate
+
+#3 Load and run multiQC on forward and reverse_reads
+module load python/v2.7.17 MultiQC/v1.8
+multiqc /groups/hologenomics/eirikur/data/HOSTGUTINTERACT/CRISPR_batch_2/data/fastqc/forward --filename multiqc_data_forward
+multiqc /groups/hologenomics/eirikur/data/HOSTGUTINTERACT/CRISPR_batch_2/data/fastqc/reverse --filename multiqc_data_reverse
+
+#There will come an error when multiQC is run saying something about incompatibility between python and multiQC versions and the job will be
+#reported as a fail, but it will still return a multiQC report for all the samples. which is what you want.
+
+#4 analize multiQC reports and take down some results and make
+#a judgement on if the sequences need preprocessing or if they can do through dada2 already,
+#Additionally you can also take a rough desicion on the truncating parameter in dada2 based on the quality profile of the reads.
+#just make sure that the overlap between forward and reverse sequencing will be at least 20+lenght.
