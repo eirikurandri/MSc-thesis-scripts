@@ -1,0 +1,106 @@
+---
+title: "Decontam_CRISPR_batch2_Overlap_2"
+author: "Eiríkur Andri Thormar"
+date: "18/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+#Load packages
+library(dplyr)
+library(tidyverse)
+library(phyloseq)
+library(decontam)
+
+#1. #Load in data
+meta <- read.csv("metadata_complete.csv" , sep=",",stringsAsFactors = TRUE)
+asv.tab <- read.delim("ASVs_counts.tsv")
+asv.taxa <- read.delim("ASVs_taxonomy.tsv")
+
+#Samples not in the analysis
+outcasts <- c("Mo-014CR","2ALF002","2MOF001")
+#Setting up data
+#1. metadata
+rownames(meta)<-meta$demultiplexing_ID
+meta <- meta %>% filter(!demultiplexing_ID %in% outcasts)
+#2. asv. tab
+rownames(asv.tab) <- asv.tab$X 
+asv.tab <- subset(asv.tab, select = -X)
+
+#3. asv.taxa
+rownames(asv.taxa) <- asv.taxa$X
+asv.taxa <- subset(asv.taxa, select = -X)
+#4. Data frame for visualising and matching detected contaminants to taxonomy
+asv.taxa.df <- as.data.frame(asv.taxa)
+asv.taxa.df$ASV.ID <- row.names(asv.taxa.df)
+
+#Do remember to modify the tables so they can be put together in a phyloseq object
+#here it is
+meta <- meta %>% arrange(Sample_ID)
+rownames(meta)<-meta$demultiplexing_ID
+colnames(asv.tab)<-rownames(meta)
+
+#2. #Phyloseq obecjt
+ps <- phyloseq(otu_table(asv.tab, taxa_are_rows=TRUE),
+                  tax_table(as.matrix(asv.taxa)),
+                  sample_data(meta)
+               )
+#3. #check library size(optional fun)
+#Setup
+df <- as.data.frame(sample_data(ps))
+df$LibrarySize <- sample_sums(ps)
+df <- df[order(df$LibrarySize),]
+df$Index <- seq(nrow(df))
+#Full
+
+fullsize <- ggplot(data=df, aes(x=Index, y=LibrarySize, color=Sample_type)) + geom_point() 
+#sample_type
+sample_size <- ggplot(data=df, aes(x=Index, y=LibrarySize, color=Sample_type)) + geom_point() +facet_wrap(~Sample_type)
+#Fish_type
+Fish_type_size <- ggplot(data=df, aes(x=Index, y=LibrarySize, color=Sample_type)) + geom_point() +facet_wrap(~Fish_type)
+
+#Print output
+#full
+tiff("Library_size_full.tiff", units="in", width=12, height=8, res=300)
+fullsize
+dev.off()
+#Sample_type based
+tiff("Library_size_Sample_type.tiff", units="in", width=12, height=8, res=300)
+sample_size
+dev.off()
+#Fish_type based
+tiff("Library_size_Fish_type.tiff", units="in", width=12, height=8, res=300)
+Fish_type_size
+dev.off()
+```
+Harsh prevalence method
+```{r}
+sample_data(ps)$is.neg <- sample_data(ps)$Sample_type == "blank"
+#method 2 harsher removal, the same as method 2 just set a threshold of 0.5.
+#deonctam
+contam.prev05 <- isContaminant(ps, method="prevalence", neg="is.neg",batch="Batch",threshold = 0.5)
+#TRUE overview
+table(contam.prev05$contaminant)
+#nr ASVs filtered
+head(which(contam.prev05$contaminant))
+#Taxa names of filtered things
+taxa_prevalence05 <- as.data.frame(asv.taxa.df[row.names(contam.prev05[which(contam.prev05$contaminant),]),
+            c("Class","Family","Genus")])
+```
+We will use one of the prevaence methods
+```{r}
+#4. #filter out at write tables
+ps.filt.prev05 <- prune_taxa(!contam.prev05$contaminant,ps)
+
+#make new ASV table
+write.table(ps.filt.prev05@otu_table,"ASV_counts_deconprev_harsh_CRISPR_filt.tsv",sep="\t", quote=F, col.names=NA)
+
+#make new taxa table
+write.table(ps.filt.prev05@tax_table, "ASVs_taxonomy_deconprev_harsh_CRISPR_filt.tsv",sep="\t", quote=F, col.names=NA)
+
+#Save the contaminants in a new table
+write.table(taxa_prevalence05, "contam_taxa.tsv",sep="\t", quote=F, col.names=NA)
+```
