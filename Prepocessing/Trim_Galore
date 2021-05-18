@@ -1,0 +1,3 @@
+#trimgalore
+module load java fastqc python cutadapt TrimGalore parallel
+parallel --xapply trim_galore --nextera --paired --fastqc -o trim_galore/ ::: *_R1_001.fastq.gz ::: *_R2_001.fastq.gz
