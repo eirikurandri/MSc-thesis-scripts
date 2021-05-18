@@ -94,17 +94,6 @@ div_test_plot(f_richness,posthoc=TRUE,threshold=0.05,col=childish)
 div_test_plot(f_Shannon,posthoc=TRUE,threshold=0.05,col=childish)
 div_test_plot(f_Simpson,posthoc=TRUE,threshold=0.05,col=childish)
 
-
-alpha_richnes <- z(f_richness,col=childish,chart="box") + geom_jitter(aes(color=Group)) + labs(titile ="Alpha diversity of Faeces samples",y = "Richness (q=0)") + theme(legend.position = "none",title = element_text(face = "italic")) + ylim(c(0,40))
-
-alpha_shannon <- z(f_Shannon,posthoc=TRUE,threshold=0.05,col=childish,chart="box") + geom_jitter(aes(color=Group)) + labs(titile ="Alpha diversity of Faeces samples",y = "Shannon diversity (q=1)") + theme(legend.position = "none",title = element_text(face = "italic")) + ylim(c(0,5))
-
-alpha_simpson <- z(f_Simpson,posthoc=TRUE,threshold=0.05,col=childish,chart="box") + geom_jitter(aes(color=Group)) + labs(titile ="Alpha diversity of Faeces samples",y = "Simpson diversity (q=2)") + theme(legend.position = "none",title = element_text(face = "italic")) + ylim(c(0,5))
-
-
-alpha_final <- alpha_richnes + alpha_shannon + alpha_simpson + plot_annotation(tag_levels = "A",title = "Alpha deversities",subtitle = "Genus level") & theme(title = element_text(size=20),axis.text = element_text(size=15))
-
-
 #Same as above just unfiltered and not merged into genera(ASV_level)
 physeq_faeces <- subset_samples(physeq_a,Sample_type=="faeces")
 physeq_faeces <- subset_samples(physeq_faeces,experi=="Tyr")
@@ -134,16 +123,8 @@ div_test_plot(f_richness,posthoc=TRUE,threshold=0.05,col=childish)
 div_test_plot(f_Shannon,posthoc=TRUE,threshold=0.05,col=childish)
 div_test_plot(f_Simpson,posthoc=TRUE,threshold=0.05,col=childish)
 
-alpha_richnes <- z(f_richness,col=childish,chart="box") + geom_jitter(aes(color=Group)) + labs(titile ="Alpha diversity of Faeces samples",y = "Richness (q=0)") + theme(legend.position = "none",title = element_text(face = "italic"))
-
-alpha_shannon <- z(f_Shannon,col=childish,chart="box") + geom_jitter(aes(color=Group)) + labs(titile ="Alpha diversity of Faeces samples",y = "Shannon diversity (q=1)") + theme(legend.position = "none",title = element_text(face = "italic")) 
-
-alpha_simpson <- z(f_Simpson,posthoc=TRUE,threshold=0.05,col=childish,chart="box") + geom_jitter(aes(color=Group)) + labs(titile ="Alpha diversity of Faeces samples",y = "Simpson diversity (q=2)") + theme(legend.position = "none",title = element_text(face = "italic"))
-
-
-alpha_final <- alpha_richnes + alpha_shannon + alpha_simpson + plot_annotation(tag_levels = "A",title = "Alpha deversities",subtitle = "ASV level")
 ```
-Abundances
+Relative Abundances
 ```{r}
 
 #filter out the faeces
@@ -323,9 +304,6 @@ metacoder.plot # for ewos green more abundant in gut, no enrichment of mycoplasm
 dev.off()
 
 #Repeat the above for each individual comparison
-
-
-
 ```
 
 ```{r}
