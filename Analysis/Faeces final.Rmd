@@ -418,12 +418,10 @@ d$Ceto <- as.numeric(d$Ceto)
 d$Aero <- as.numeric(d$Aero)
 d$Vibrio <- as.numeric(d$Vibrio)
 d$Pseudo <- as.numeric(d$Pseudo)
-
+#How much of the observed difference can be attributed to each genus.
 adonis(p~Ceto,data=d,method="jaccard")
 adonis(p~Aero,data=d,method="jaccard")
 adonis(p~Vibrio,data=d,method="jaccard")
 adonis(p~Pseudo,data=d,method="jaccard")
 
-
-#correlation of Vibrio
 
