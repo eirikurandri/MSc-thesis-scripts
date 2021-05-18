@@ -1,0 +1,785 @@
+---
+title: "Samples_eval_final"
+output: html_document
+---
+```{r}
+#Load libraries and set up data
+library(phyloseq); packageVersion("phyloseq")
+library(Biostrings); packageVersion("Biostrings")
+library(ggplot2); packageVersion("ggplot2")
+library(iNEXT); packageVersion("iNEXT")
+library(ape); packageVersion("ape")
+library(vegan); packageVersion("vegan")
+library(dplyr); packageVersion("dplyr")
+library(cowplot); packageVersion("cowplot")
+library(plyr); packageVersion("plyr")
+library(sjmisc); packageVersion("sjmisc")
+library(data.table); packageVersion("data.table")
+library(metacoder);packageVersion("metacoder")
+library(hilldiv);packageVersion("hilldiv")
+library(car);packageVersion("car")
+library(lme4);packageVersion("lme4")
+library(RColorBrewer);packageVersion("RColorBrewer")
+library("ape")
+library(patchwork)
+library(ggpubr)
+
+
+ASVs_deconprev_harsh <- read.csv("Curated_Table_CRISPR_deconprev_harsh.txt", sep = ",")
+tax_deconprev_harsh <- read.csv("Curated_Tax_CRISPR_deconprev_harsh.csv", sep = ",")
+md <- read.csv("metadata_complete.csv", sep = ",",stringsAsFactors = TRUE)
+md <- md %>% filter(!demultiplexing_ID %in% c("Mo-014CR","2ALF002","2MOF001"))
+md <- md %>% arrange(Sample_ID)
+md$Batch <- as.factor(md$Batch)
+rownames(md)<-md$demultiplexing_ID
+rownames(tax_deconprev_harsh) <- rownames(ASVs_deconprev_harsh)
+colnames(ASVs_deconprev_harsh)<-rownames(md)
+
+ugly<- c("#C15444","#C1B244","#26736A","#C17A44","#2D8652","#2E428A","#A83861","#BEE0E9","#D4C57D","#4D3619","#883091","#B3B4E6","#CDCF6E","#6ECFA8","#1F1F1F","#5E5E5E","#0E220B","#CD936A","#62CB8C","#C65353","#C6BA53","#4FB3C4","#8FC757","#6B4424","#EC453C","#F4A590","#D6F7AB","#78F297", "#310E8B","#EA462A")
+
+#This one is more bright but childish
+childish <- c("#B71C1C","#FFC107","#A7FFEB","#FFB74D","#757575","#FF5252","#BA68C8","#8BC34A","#F57F17","#009688","#FF80AB","#304FFE","#455A64","#69F0AE","#FF5722","#9C640C","#F1C40F","#A93226","#76448A","#17A589","#C6BA53","#4FB3C4","#8FC757","#6B4424","#EC453C","#F4A590","#D6F7AB","#78F297", "#310E8B","#EA462A")
+
+physeq<- phyloseq(otu_table(ASVs_deconprev_harsh,taxa_are_rows=TRUE),
+                   tax_table(as.matrix(tax_deconprev_harsh)),
+                   sample_data(md))
+
+#Subset it as you want 
+#for the whole dataset
+#extract the Feed and Artemia
+physeq <- subset_samples(physeq, experi!="IRF8")
+  #exclude the larvae
+physeq <- subset_samples(physeq,!Sample_type %in% c("larvae","positive_control","water","Feed","artemia"))
+physeq <- subset_samples(physeq, !demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020"))
+physeq = tax_glom(physeq, "Genus")
+
+## Create tree for physeq to use unifrac distances for ordination
+random_tree = rtree(ntaxa(physeq), rooted=TRUE, tip.label=taxa_names(physeq))
+#merge the tree to the physeq object
+physeq = merge_phyloseq(physeq, random_tree)
+#Generate sample based relative abundace (and filter low occuring ASVs)
+physeq_filt = prune_samples(sample_sums(physeq) >= 100, physeq)
+#decided not to filter low occuring ASV's in this case
+# relative abundance
+
+physeq_norm = transform_sample_counts(physeq_filt, function(x) x/sum(x))
+physeq_norm = phyloseq::filter_taxa(physeq_norm, function(x) var(x) > 0, TRUE)
+
+```
+first we plot and look at the post-extraction DNA concentration
+```{r}
+
+mdq <- md %>% filter(Sample_type %in% c("faeces","gut","tail_fin","skin_swab")) %>% filter(experi!="IRF8") %>% filter(!demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020")) %>%
+ggplot(aes(Sample_type,Qubit)) + geom_boxplot(alpha=0.7)+theme_minimal() + labs(y="Post-extraction DNA concentration",x="Sample type") + scale_x_discrete(labels=c("Faeces","Gut","Skin swab","Tail fin")) + theme(axis.title.x = element_blank())
+
+md %>% filter(experi!="IRF8") %>% filter(Sample_type =="faeces") %>% summarise(mean = mean(Qubit),sd=sd(Qubit))
+md %>% filter(experi!="IRF8") %>% filter(Sample_type =="gut") %>% summarise(mean = mean(Qubit),sd=sd(Qubit))
+md %>% filter(experi!="IRF8") %>% filter(Sample_type =="tail_fin") %>% summarise(mean = mean(Qubit),sd=sd(Qubit))
+md %>% filter(experi!="IRF8") %>% filter(Sample_type =="skin_swab") %>% summarise(mean = mean(Qubit),sd=sd(Qubit))
+
+```
+Next we take a look at the bioinformatic pipeline What samples were high microbial biomass, although this should have been done for the qPCR step there is not enought to represent the whole thing in a plot like this. 
+```{r}
+#Make a new column for the sample counts used in the analysis
+physeq_counts <- subset_samples(physeq,Sample_type %in% c("faeces","gut","tail_fin","skin_swab"))
+counts <- as.data.frame(sample_sums(physeq_counts))
+
+#The summary tables from dada2
+sum1 <- read.csv("data/summary_reads_table_run1.txt",sep='\t',header=TRUE,as.is=TRUE)
+sum2 <- read.csv("data/summary_reads_table_run2.txt",sep='\t',header=TRUE,as.is=TRUE)
+sum <- rbind(sum1,sum2)
+sum <- subset(sum,select=-c(nonchim,final_perc_reads_retained))
+
+
+#add the summary tables from dada2 and add the counts used in the analysis
+mdb <- cbind(md,sum)
+mdb <- mdb %>% filter(Sample_type %in% c("faeces","gut","tail_fin","skin_swab")) %>% filter(experi!="IRF8") %>% filter(!demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020")) 
+mdb <- cbind(counts,mdb)
+
+
+#plot
+mdbp <- mdb %>%  pivot_longer(c("dada2_input","sample_sums(physeq_counts)","merged"),names_to="filtering",values_to="count") %>%
+ggplot(aes(Sample_type,count,fill=filtering,col=Batch))+ 
+geom_boxplot(alpha=0.7)+
+theme_minimal() + 
+theme(axis.text.y = element_text(),axis.title.x= element_blank()) + 
+labs(y="Read counts",x="Sample type") + 
+scale_x_discrete(labels=c("Faeces","Gut","Skin swab","Tail fin")) +
+scale_fill_manual(values=brewer.pal(n = 3, name = "RdBu"),name="Bioinformatic filtering", labels=c("Input reads","Merged reads", "Output reads")) +
+scale_color_manual(values=c("lightblue","black"),name="Sequencing run",labels=c("1", "2")) +
+scale_y_continuous(labels=scales::comma,limits = c(0,450000) ) 
+#ggforce::facet_row(~Sample_type,scales = "free",space="free")
+
+mdq + mdbp + plot_layout(widths = c(1,2)) + plot_annotation(tag_levels="A") & theme(title = element_text(size=20),axis.text = element_text(size=20),axis.text.x = element_text(angle=90),legend.title = element_text(size=16),legend.text=element_text(size=15))
+
+#extract_values
+
+mdb %>%  filter(Sample_type =="faeces") %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+mdb %>%  filter(Sample_type =="gut") %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+mdb %>%  filter(Sample_type =="tail_fin") %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+mdb %>% filter(Sample_type =="skin_swab") %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+#Extract values tht exemplify the differences between batches in teh faeces samples
+#Batch1 read counts
+mdb %>%  filter(Sample_type =="faeces") %>% filter(Batch==1) %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+#Batch2 read counts
+mdb %>%  filter(Sample_type =="faeces") %>% filter(Batch==2) %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+#Extract values tht exemplify the differences between batches in the tail fin samples
+#Batch1 read counts
+mdb %>%  filter(Sample_type =="tail_fin") %>% filter(Batch==1) %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+#Batch2 read counts
+mdb %>%  filter(Sample_type =="tail_fin") %>% filter(Batch==2) %>% summarise(mean_dada = mean(`sample_sums(physeq_counts)`),sd=sd(`sample_sums(physeq_counts)`))
+
+
+```
+Decontam
+```{r}
+
+#For this section the filtering step in the above has been removed to show all the blanks despite their count
+decontam <- read.csv("contam_taxa.tsv", sep='\t',header=TRUE,as.is=TRUE)
+
+physeq_decon <- subset_samples(physeq,Sample_type=="blank")
+
+physeq_blank_norm = transform_sample_counts(physeq_decon, function(x) x/sum(x))
+physeq_blank_norm = phyloseq::filter_taxa(physeq_blank_norm, function(x) var(x) > 0, TRUE)
+
+TopNOTUs1 = names(sort(taxa_sums(physeq_blank_norm), TRUE)[1:20])
+physeq_blank_30 = prune_taxa(TopNOTUs1, physeq_blank_norm)
+
+plot_blank_counts <- plot_bar(physeq_decon,x="demultiplexing_ID")+geom_bar(stat="identity",fill="black") + theme_cowplot() + theme(axis.title.x = element_blank(), axis.text.x = element_blank(),axis.ticks.x = element_blank(),axis.line.x = element_blank(),strip.background = element_blank(),strip.text = element_blank(),title = element_text(size=20)) + labs(y="Filtered read counts",x="") + ggforce::facet_row(~Blank_Type,scales = "free_x",space = "free") +
+scale_y_continuous(n.breaks = 10)
+
+plot_blank_abundace_Class = plot_bar(physeq_blank_30, "demultiplexing_ID", fill = "Genus") + 
+  geom_bar(aes(color=Genus, fill=Genus), stat="identity", position="stack") +
+  theme_cowplot() + 
+  theme(axis.text.x = element_blank(),axis.title.x= element_blank(),strip.background = element_rect(color = "gray"),title = element_text(size=20),legend.text = element_text(face="italic"))+
+  labs(x = "Samples") +
+  labs(y = "Relative Abundance") + 
+  scale_fill_manual(values=ugly) +
+  scale_color_manual(values=ugly) +
+  ggforce::facet_row(~Blank_Type,scales = "free_x",space = "free",strip.position = "bottom")
+
+ plot_blank_counts/plot_blank_abundace_Class + plot_layout(guides = "collect")
+ 
+ #Decontam before removal of contaminants
+ASVs_predecon <- read.csv("ASVs_counts.tsv", sep='\t',header=TRUE,as.is=TRUE)
+tax_predeconh <- read.csv("ASVs_taxonomy.tsv", sep='\t',header=TRUE,as.is=TRUE)
+meta_predecon <- read.csv("metadata_complete.csv", sep = ",",stringsAsFactors = TRUE)
+rownames(ASVs_predecon) <- ASVs_predecon$X
+rownames(tax_predeconh) <- ASVs_predecon$X
+ASVs_predecon <- subset(ASVs_predecon, select=-X)
+tax_predecon <- subset(tax_predeconh, select=-X)
+meta_predecon <- meta_predecon %>% filter(!demultiplexing_ID %in% c("Mo-014CR","2ALF002","2MOF001"))
+meta_predecon <- meta_predecon %>% arrange(Sample_ID)
+rownames(meta_predecon) <- meta_predecon$Sample_ID
+colnames(ASVs_predecon) <- rownames(meta_predecon)
+
+physeq_d <- phyloseq(otu_table(ASVs_predecon,taxa_are_rows=TRUE),
+                   tax_table(as.matrix(tax_predecon)),
+                   sample_data(meta_predecon))
+
+
+physeq_d <- subset_samples(physeq_d, experi!="IRF8")
+  #exclude the larvae
+physeq_d <- subset_samples(physeq_d,!Sample_type %in% c("larvae","positive_control","water","Feed","artemia"))
+physeq_d <- subset_samples(physeq_d, !demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020"))
+physeq_d= tax_glom(physeq_d, "Genus")
+
+
+physeq_norm_d = transform_sample_counts(physeq_d, function(x) x/sum(x))
+physeq_norm_d = phyloseq::filter_taxa(physeq_norm_d, function(x) var(x) > 0, TRUE)
+
+physeq_norm_blank_d <- subset_samples(physeq_norm_d,Sample_type=="blank")
+physeq_norm_blank_d = transform_sample_counts(physeq_norm_blank_d, function(x) x/sum(x))
+physeq_norm_blank_d = phyloseq::filter_taxa(physeq_norm_blank_d, function(x) var(x) > 0, TRUE)
+
+TopNOTUs1 = names(sort(taxa_sums(physeq_norm_blank_d), TRUE)[1:20])
+physeq_blank_30_d = prune_taxa(TopNOTUs1, physeq_norm_blank_d)
+
+
+plot_blank_abundace_Class_d = plot_bar(physeq_blank_30_d, "demultiplexing_ID", fill = "Genus") + 
+  geom_bar(aes(color=Genus, fill=Genus), stat="identity", position="stack") +
+  theme_cowplot() + 
+  theme(axis.text.x = element_blank(),axis.title.x= element_blank(),strip.background = element_rect(color = "gray"),title = element_text(size=20),legend.text = element_text(face="italic"))+
+  labs(x = "Samples") +
+  labs(y = "Relative Abundance") + 
+  scale_fill_manual(values=ugly) +
+  scale_color_manual(values=ugly) +
+  ggforce::facet_row(~Blank_Type,scales = "free_x",space = "free",strip.position = "bottom")
+
+
+plot_blank_abundace_Class / plot_blank_abundace_Class_d #For appendix
+
+#Now we plot the profiles of all the samples
+
+physeq_norm_p = transform_sample_counts(physeq, function(x) x/sum(x))
+physeq_norm_p = phyloseq::filter_taxa(physeq_norm_p, function(x) var(x) > 0, TRUE)
+
+
+
+plot_heat1 <- plot_heatmap(physeq_norm_p) + ggforce::facet_row(~Sample_type,scales = "free_x",space = "free",strip.position = "bottom") +  theme(axis.text.x = element_blank(),axis.title = element_blank(),strip.background = element_rect(colour = "gray"),legend.position = "none",strip.text = element_text(size=15)) + labs(title = "post-decontamination")
+
+plot_heat2 <- plot_heatmap(physeq_norm_d) + ggforce::facet_row(~Sample_type,scales = "free_x",space = "free",strip.position = "bottom") + theme(axis.text.x = element_blank(),axis.title = element_blank(),strip.background = element_blank(),strip.text = element_blank()) + labs(title = "pre-decontamination")
+
+
+plot_heat2/plot_heat1 + plot_layout(guides = "collect")+ plot_annotation(tag_levels = "A",title = "Relative abundance of genera accross the dataset") & theme(axis.text.y = element_blank()) 
+
+#Abundances
+plot_Class = plot_bar(physeq_norm, "demultiplexing_ID", fill = "Class") + 
+  geom_bar(aes(color=Class, fill=Class), stat="identity", position="stack") +
+  theme_cowplot() + 
+  theme(axis.text.x = element_blank(),axis.title.x= element_blank(),strip.background = element_rect(color = "gray"),title = element_text(size=20),legend.text = element_text(face="italic"))+
+  labs(x = "Samples") +
+  labs(y = "Relative Abundance") + 
+  scale_fill_manual(values=ugly) +
+  scale_color_manual(values=ugly) +
+  ggforce::facet_row(~Sample_type,scales = "free_x",space = "free",strip.position = "bottom")
+
+plot_Class1 = plot_bar(physeq_norm_d, "demultiplexing_ID", fill = "Class") + 
+  geom_bar(aes(color=Class, fill=Class), stat="identity", position="stack") +
+  theme_cowplot() + 
+  theme(axis.text.x = element_blank(),axis.title.x= element_blank(),strip.background = element_rect(color = "gray"),title = element_text(size=20),legend.text = element_text(face="italic"))+
+  labs(x = "Samples") +
+  labs(y = "Relative Abundance") + 
+  scale_fill_manual(values=ugly) +
+  scale_color_manual(values=ugly) +
+  ggforce::facet_row(~Sample_type,scales = "free_x",space = "free",strip.position = "bottom")
+
+plot_Class1/plot_Class
+
+
+```
+Negative control comparison
+```{r}
+physeq_in <- subset_samples(physeq_norm,Sample_type %in% c("blank","gut","faeces"))
+physeq_out <-  subset_samples(physeq_norm,Sample_type %in% c("blank","skin_swab","tail_fin"))
+physeq_in <- prune_taxa(taxa_sums(physeq_in)>0,physeq_in)
+physeq_out <- prune_taxa(taxa_sums(physeq_out)>0,physeq_out)
+
+
+ordi_in_wuni<- ordinate(physeq_in, method="PCoA","unifrac",weighted=TRUE)
+ordi_out_wuni <- ordinate(physeq_out, method="PCoA","unifrac", weighted=TRUE)
+
+
+#Ordination
+p1 = plot_ordination(physeq_in, ordi_in_wuni, type="Samples",
+                     color="Sample_type", shape="Batch") 
+pordi_in_wuni = p1+ geom_point(size = 5) + theme_minimal() + 
+    scale_fill_manual(values=c("black","brown","red")) + 
+  scale_color_manual(values=c("black","brown","red"),name="",labels=c("Negative control","Faeces","Gut")) +
+  scale_shape_discrete(name="Sequencing run")
+
+p1 = plot_ordination(physeq_out, ordi_out_wuni, type="Samples",
+                     color="Sample_type",shape="Batch") 
+pordi_out_wuni = p1+ geom_point(size = 5) + theme_minimal() + 
+    scale_fill_manual(values=c("black","gold","darkorange")) + 
+  scale_color_manual(values=c("black","gold","darkorange"),name="",labels=c("Negative control","skin swab","Tail fin")) +
+scale_shape_discrete(name="Sequencing run")
+
+
+pordi_in_wuni + pordi_out_wuni + plot_layout(guides="keep") + plot_annotation(tag_levels="A",title="PCoA",subtitle = "Weighted UniFrac")& theme(legend.position = "bottom",title = element_text(size = 20),legend.text = element_text(size=15,face="bold",color = "black"),legend.title = element_text(size = 16))
+
+#Batchwise split due to the nature of the blanks
+
+physeq_out_1 <- subset_samples(physeq_out,Batch=="1")
+physeq_out_2 <- subset_samples(physeq_out,Batch=="2")
+physeq_in_1 <- subset_samples(physeq_in,Batch=="1")
+physeq_in_2 <- subset_samples(physeq_in,Batch=="2")
+
+physeq_out_1 <- prune_taxa(taxa_sums(physeq_out_1)>0,physeq_out_1)
+physeq_out_2 <- prune_taxa(taxa_sums(physeq_out_2)>0,physeq_out_2)
+physeq_in_1 <- prune_taxa(taxa_sums(physeq_in_1)>0,physeq_in_1)
+physeq_in_2 <- prune_taxa(taxa_sums(physeq_in_2)>0,physeq_in_2)
+
+ordi_wuni_out_1 <-  ordinate(physeq_out_1, method="PCoA","unifrac",weighted=TRUE)
+ordi_wuni_out_2 <-  ordinate(physeq_out_2, method="PCoA","unifrac",weighted=TRUE)
+ordi_wuni_in_1 <-  ordinate(physeq_in_1, method="PCoA","unifrac",weighted=TRUE)
+ordi_wuni_in_2 <-  ordinate(physeq_in_2, method="PCoA","unifrac",weighted=TRUE)
+
+
+#Ordinations are plotted like so 
+
+p1 = plot_ordination(physeq_out_1, ordi_wuni_out_1, type="Samples",
+                     color="Sample_type",
+                     title="PCoA-Sequencing run 1") 
+pordi_out1_wuni = p1+ geom_point(size = 5) + theme_minimal() + labs(subtitle = "Weighted Unifrac") +
+    scale_fill_manual(values=c("black","darkorange")) + 
+  scale_color_manual(values=c("black","darkorange"),name="Sample type",labels=c("Negative control","Tail fin")) 
+
+p1 = plot_ordination(physeq_out_2, ordi_wuni_out_2, type="Samples",
+                     color="Sample_type",
+                     title="PCoA-Sequencing run 2") 
+pordi_out2_wuni = p1+ geom_point(size = 5) + theme_minimal() + labs(subtitle = "Weighted Unifrac") +
+    scale_fill_manual(values=c("black","gold","darkorange")) + 
+  scale_color_manual(values=c("black","gold","darkorange"),name="Sample type",labels=c("Negative control","Skin swab","Tail fin")) 
+
+pordi_out_wuni_batches <- pordi_out1_wuni + pordi_out2_wuni
+
+#in
+
+p1 = plot_ordination(physeq_in_1, ordi_wuni_in_1, type="Samples",
+                     color="Sample_type", 
+                     title="PCoA-Sequencing run 1") 
+pordi_in1_wuni = p1+ geom_point(size = 5) + theme_minimal() + labs(subtitle = "Weighted Unifrac") +
+    scale_fill_manual(values=c("black","darkorange")) + 
+  scale_color_manual(values=c("black","brown"),name="Sample type",labels=c("Negative control","Faeces")) 
+
+p1 = plot_ordination(physeq_in_2, ordi_wuni_in_2, type="Samples",
+                     color="Sample_type", 
+                     title="PCoA-Sequencing run 2") 
+pordi_in2_wuni = p1+ geom_point(size = 5) + theme_minimal() + labs(subtitle = "Weighted Unifrac") +
+    scale_fill_manual(values=c("black","gold","darkorange")) + 
+  scale_color_manual(values=c("black","brown","red"),name="Sample type",labels=c("Negative control","Faeces","Gut")) 
+
+pordi_in_wuni_batches <- pordi_in1_wuni + pordi_in2_wuni
+
+#merged_blank_comparison
+
+blank_comparison <- pordi_in_wuni_batches/pordi_out_wuni_batches + plot_layout(guides = "collect") + plot_annotation(tag_levels="A") 
+
+
+#PERMANOVA 
+#For the whole thing
+adonis(t(as.data.frame(physeq_in@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_in@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_out@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_out@sam_data)),method = "bray")
+
+#Batchwise
+adonis(t(as.data.frame(physeq_out_1@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_out_1@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_out_2@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_out_2@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_in_1@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_in_1@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_in_2@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_in_2@sam_data)),method = "bray")
+
+
+#Then check if each of them is significantly different from the blanks in total and to the batch they belong to
+
+#Faeces
+physeq_gutblank <-  subset_samples(physeq_in, Sample_type %in% c("blank","faeces"))
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #signifnicant
+
+physeq_gutblank <-  subset_samples(physeq_in, Sample_type %in% c("blank","faeces"))
+physeq_gutblank<-  subset_samples(physeq_gutblank, Batch=="2")
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #most difference
+
+physeq_gutblank <-  subset_samples(physeq_in, Sample_type %in% c("blank","faeces"))
+physeq_gutblank<-  subset_samples(physeq_gutblank, Batch=="1")
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank) #more difference
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray")
+
+#Gut
+physeq_gutblank <-  subset_samples(physeq_in, Sample_type %in% c("blank","gut"))
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #signifnicant
+
+physeq_gutblank <-  subset_samples(physeq_in, Sample_type %in% c("blank","gut"))
+physeq_gutblank<-  subset_samples(physeq_gutblank, Batch=="2")
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #more significant
+
+#Tail fin
+
+physeq_gutblank <-  subset_samples(physeq_out, Sample_type %in% c("blank","tail_fin"))
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #signifnicant 3%
+
+physeq_gutblank <-  subset_samples(physeq_out, Sample_type %in% c("blank","tail_fin"))
+physeq_gutblank<-  subset_samples(physeq_gutblank, Batch=="2")
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #significant 15%
+
+physeq_gutblank <-  subset_samples(physeq_out, Sample_type %in% c("blank","tail_fin"))
+physeq_gutblank<-  subset_samples(physeq_gutblank, Batch=="1")
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank) #significant 4%
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray")
+
+#skin swab
+
+physeq_gutblank <-  subset_samples(physeq_out, Sample_type %in% c("blank","skin_swab"))
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") #signifnicant 6%
+
+physeq_gutblank <-  subset_samples(physeq_out, Sample_type %in% c("blank","skin_swab"))
+physeq_gutblank<-  subset_samples(physeq_gutblank, Batch=="2")
+physeq_gutblank <- prune_taxa(taxa_sums(physeq_gutblank)>0,physeq_gutblank)
+
+adonis(t(as.data.frame(physeq_gutblank@otu_table))~Sample_or_control, data=as.data.frame(as.matrix(physeq_gutblank@sam_data)),method = "bray") # significant 11%
+
+
+#Abundances #Isn't needed but highlights the results
+physeq_gutswabwater_final <- subset_samples(physeq_filt, Sample_type %in% c("faeces","gut","skin_swab","tail_fin","blank"))
+physeq_gutswabwater_final<- subset_samples(physeq_gutswabwater_final, experi!="IRF8")
+
+
+#physeq_gutswabwater_final<- subset_samples(physeq_gutswabwater_final, Batch="2")
+#Make new variable by which to merge the samples
+stype <- as.character(get_variable(physeq_gutswabwater_final, "Sample_type"))
+#btype <- as.character(get_variable(physeq_gutswabwater_final,"Fish_type"))
+sample_data(physeq_gutswabwater_final)$sample_batch<- mapply(paste0,stype,collapse="_")
+
+#merge by new variable
+physeq_gutswabwater_final <- merge_samples(physeq_gutswabwater_final, "sample_batch")
+#clc realtive abundnce and normailise
+physeq_gutswabwater_final<- transform_sample_counts(physeq_gutswabwater_final, function(x) x/sum(x))
+physeq_gutswabwater_final = phyloseq::filter_taxa(physeq_gutswabwater_final, function(x) var(x) > 0, TRUE)
+#sample_names(physeq_gutswabwater_final) <- c("Gut","Skin swab","Water")
+
+TopNOTUs = names(sort(taxa_sums(physeq_gutswabwater_final), TRUE)[1:30])
+physeq_30_blank = prune_taxa(TopNOTUs,physeq_gutswabwater_final)
+
+#plot
+plot_gutswabwater_ab_Class = plot_bar(physeq_gutswabwater_final,fill = "Class") + 
+  geom_bar(aes(color=Class, fill=Class), stat="identity", position="stack") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(face = "bold"),strip.text.x = element_blank(),strip.background = element_blank()) +
+  labs(x = "") +
+  labs(y = "Relative Abundance") + 
+  scale_fill_manual(values=childish) +
+  scale_color_manual(values=childish) 
+
+
+plot_gutswabwater_ab_Class1 = plot_gutswabwater_ab_Class + ggforce::facet_row(~Sample_type, scales = "free_x", space = "free") + guides(fill=guide_legend(ncol=1)) 
+
+
+```
+Environmental control samples
+```{r}
+physeq<- phyloseq(otu_table(ASVs_deconprev_harsh,taxa_are_rows=TRUE),
+                   tax_table(as.matrix(tax_deconprev_harsh)),
+                   sample_data(md))
+
+#we agglomerate taxa and normalise data 
+physeq = tax_glom(physeq, "Genus")
+random_tree = rtree(ntaxa(physeq), rooted=TRUE, tip.label=taxa_names(physeq))
+physeq = merge_phyloseq(physeq, random_tree)
+physeq_filt = prune_samples(sample_sums(physeq) >= 100, physeq)
+physeq_norm = transform_sample_counts(physeq_filt, function(x) x/sum(x))
+physeq_norm = phyloseq::filter_taxa(physeq_norm, function(x) var(x) > 0, TRUE)
+
+#In the analysis we are interested in the non larval samples of the Tyrosinase sample set Therefore we exclude the larvae
+#We kind of know that we can exclude the blanks however we will include them in the prelimianry ordination
+
+physeq_enviro <- subset_samples(physeq_norm, experi!="IRF8")
+physeq_enviro <- subset_samples(physeq_enviro, !Sample_type %in% c("larvae","positive_control"))
+physeq_enviro <- subset_samples(physeq_enviro, !demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020"))
+physeq_enviro <- prune_taxa(taxa_sums(physeq_enviro)>0,physeq_enviro)
+
+#Feed
+physeq_f_feed <- subset_samples(physeq_enviro, Sample_type %in% c("Feed","faeces","gut","artemia"))
+physeq_f_feed <- prune_taxa(taxa_sums(physeq_f_feed)>0,physeq_f_feed )
+
+physeq_t_feed <- subset_samples(physeq_enviro, Sample_type %in% c("Feed","tail_fin","skin_swab","artemia"))
+physeq_t_feed <- prune_taxa(taxa_sums(physeq_t_feed)>0,physeq_t_feed )
+
+#lets first ordinate for the whole sample set
+
+ordi_f_feed_wuni <- ordinate(physeq_f_feed, method = "PCoA","unifrac",weighted= TRUE)
+ordi_f_feed_uni <- ordinate(physeq_f_feed, method = "PCoA","unifrac",weighted= FALSE)
+ordi_f_feed_bray <- ordinate(physeq_f_feed, method = "PCoA","bray")
+ordi_f_feed_jaccard <- ordinate(physeq_f_feed, method = "PCoA","jaccard")
+
+p1 = plot_ordination(physeq_f_feed, ordi_f_feed_wuni, type="Samples",
+                     color="Sample_type", 
+                     title="")
+pordi_f_feed_wuni = p1+ geom_point(size = 5) + theme_minimal() +  theme(legend.position = "top") + labs(subtitle = "") +
+   scale_fill_manual(values=c("#757575","brown","#26736A","red")) + 
+  scale_color_manual(values=c("#757575","brown","#26736A","red"),name="",labels=c("Artemia","Faeces","Feed","Gut"))
+
+pordi_f_feed_wuni
+
+ordi_t_feed_wuni <- ordinate(physeq_t_feed, method = "PCoA","unifrac",weighted= TRUE)
+ordi_t_feed_uni <- ordinate(physeq_t_feed, method = "PCoA","unifrac",weighted= FALSE)
+ordi_t_feed_bray <- ordinate(physeq_t_feed, method = "PCoA","bray")
+ordi_t_feed_jaccard <- ordinate(physeq_t_feed, method = "PCoA","jaccard")
+
+
+p1 = plot_ordination(physeq_t_feed, ordi_t_feed_wuni, type="Samples",
+                     color="Sample_type", 
+                     title="")
+pordi_t_feed_wuni = p1+ geom_point(size = 5) + theme_minimal() +  theme(legend.position = "top") + labs(subtitle = "") +
+   scale_fill_manual(values=c("#757575","#26736A", "gold","darkorange")) + 
+  scale_color_manual(values=c("#757575","#26736A", "gold","darkorange"), name="", labels=c("Artemia","Feed","Skin swab","Tail fin"))
+
+pordi_t_feed_wuni
+
+pordi_feed_full <- pordi_f_feed_wuni + pordi_t_feed_wuni + plot_layout(guides = "keep") + plot_annotation(tag_levels="A",title="PCoA",subtitle = "Weighted UniFrac")& theme(legend.position = "bottom",title = element_text(size = 20),legend.text = element_text(size=15,face="bold",color = "black"),legend.title = element_text(size = 16))
+
+#PLus abundance plot
+physeq_full_feed_f <- subset_samples(physeq_filt, Sample_type %in% c("Feed","faeces","tail_fin","artemia","gut","skin_swab"))
+physeq_full_feed_f <- subset_samples(physeq_full_feed_f , !demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020"))
+physeq_full_feed_f<- subset_samples(physeq_full_feed_f, experi!="IRF8")
+physeq_full_feed_f <- merge_samples(physeq_full_feed_f, "Sample_type")
+physeq_full_feed_f <- transform_sample_counts(physeq_full_feed_f, function(x) x/sum(x))
+physeq_full_feed_f = phyloseq::filter_taxa(physeq_full_feed_f, function(x) var(x) > 0, TRUE)
+sample_names(physeq_full_feed_f) <- c("Artemia","Faeces","Feed","Gut","Skin swab","Tail fin")
+
+TopNOTUs = names(sort(taxa_sums(physeq_full_feed_f), TRUE)[1:10])
+physeq_30_feed = prune_taxa(TopNOTUs, physeq_full_feed_f)
+
+plot_feed_ab_Class = plot_bar(physeq_30_feed,fill = "Genus") + 
+  geom_bar(aes(color=Genus, fill=Genus), stat="identity", position="stack") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 99,face = "bold"),strip.text.x = element_blank(),strip.background = element_blank(),legend.text = element_text(size=15,face="italic")) +
+  labs(x = "") +
+  labs(y = "Relative Abundance") + 
+  scale_fill_manual(values=childish) +
+  scale_color_manual(values=childish) 
+
+plot_feed_ab_Class = plot_feed_ab_Class + ggforce::facet_row(~Eviro, scales = "free_x", space = "free") + guides(fill=guide_legend(ncol=1)) + theme(title = element_text(size = 20),legend.title = element_text(size = 16),axis.text.x = element_text(size=10))
+  
+
+#Merge into one final summary plot
+pordi_feed_full/plot_feed_ab_Class + plot_annotation(tag_levels = "A") + plot_layout(guides = "collect")
+
+#PERMANOVA to check sigificant differences of the intestinal and skin samples
+adonis(t(as.data.frame(physeq_f_feed@otu_table))~Eviro, data=as.data.frame(as.matrix(physeq_f_feed@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_t_feed@otu_table))~Eviro, data=as.data.frame(as.matrix(physeq_t_feed@sam_data)),method = "bray")
+
+#Water samples
+
+#Start with only the water
+
+ordi_water_wuni <- ordinate(physeq_water, method = "PCoA","unifrac",weighted= TRUE)
+
+p1 = plot_ordination(physeq_water, ordi_water_wuni, type="Samples",
+                     color="Water.condition", shape="Fish_type",
+                     title="PCoA") 
+pordi_water_wuni = p1+ geom_point(size = 5) + theme_minimal() + theme(legend.position = "bottom",legend.box = "vertical",title = element_text(size=20),legend.title = element_text(size=15),legend.text = element_text(size = 15,face="bold")) + labs(subtitle = "Weighted UniFrac") + 
+    scale_fill_manual(values=childish) + 
+  scale_color_manual(values=childish,labels=c("Low","High","Medium")) + 
+  scale_shape_discrete(labels=c("Albino tank","Mosaic tank","WT tank")) +
+  guides(shape=guide_legend(title="Water from:"),color=guide_legend(title = "Amount of faeces in water"))
+
+pordi_water_wuni
+
+
+#PERMANOVA
+adonis(t(as.data.frame(physeq_water@otu_table))~Fish_type,data=as.data.frame(as.matrix(physeq_water@sam_data)),method = "bray") #NS
+adonis(t(as.data.frame(physeq_water@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_water@sam_data)),method = "bray") #S
+
+adonis(t(as.data.frame(physeq_water@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_water@sam_data)),method = "bray") #NS
+
+#Water condition accounts for 46% of the difference p=0.005**
+#Fish_type is not significant 0.406
+groups <- as.data.frame(as.matrix(physeq_water@sam_data))
+unifrac.dist_water <- UniFrac(physeq_water, weighted = TRUE)
+betadis <- betadisper(unifrac.dist_water,group = groups$Water.condition)
+anova(betadis)
+TukeyHSD(betadis)
+
+
+
+#Then water and faeces
+physeq_poopwater <-  subset_samples(physeq_enviro, Sample_type %in% c("water","faeces"))
+physeq_poopwater <- prune_taxa(taxa_sums(physeq_poopwater)>0,physeq_poopwater)
+
+ordi_poopwater_wuni <- ordinate(physeq_poopwater, method = "PCoA","unifrac",weighted= TRUE)
+ordi_poopwater_uni <- ordinate(physeq_poopwater, method = "PCoA","unifrac",weighted= FALSE)
+
+p1 = plot_ordination(physeq_poopwater, ordi_poopwater_wuni, type="Samples",
+                     color="Sample_type",shape = "Water.condition",
+                     title="") 
+pordi_poopwater_wuni = p1+ geom_point(size = 5) + theme_minimal() + theme(legend.position = "bottom",legend.box = "vertical",title = element_text(size=20),legend.title = element_text(size=15),legend.text = element_text(size = 15,face="bold")) + labs(subtitle = "") + 
+    scale_fill_manual(values=c("brown","blue")) + 
+  scale_color_manual(values=c("brown","blue"),name="",labels=c("Faeces","Water")) +
+  scale_shape_discrete(element_blank(),element_blank())
+
+
+#PERMANOVA
+adonis(t(as.data.frame(physeq_poopwater@otu_table))~Fish_type,data=as.data.frame(as.matrix(physeq_poopwater@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_poopwater@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_poopwater@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_poopwater@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_poopwater@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_poopwater@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_poopwater@sam_data)),method = "bray")
+
+#PERMANOVA based on batch 1
+physeq_poopwater1 <-  subset_samples(physeq_poopwater, Batch=="1")
+physeq_poopwater1 <- prune_taxa(taxa_sums(physeq_poopwater1)>0,physeq_poopwater1)
+
+
+adonis(t(as.data.frame(physeq_poopwater1@otu_table))~Fish_type,data=as.data.frame(as.matrix(physeq_poopwater1@sam_data)),method = "bray") #S
+
+adonis(t(as.data.frame(physeq_poopwater1@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_poopwater1@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_poopwater1@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_poopwater1@sam_data)),method = "bray")
+
+
+#PERMANOVA on batch 2
+
+physeq_poopwater2 <-  subset_samples(physeq_poopwater, Batch=="2")
+physeq_poopwater2 <- prune_taxa(taxa_sums(physeq_poopwater2)>0,physeq_poopwater2)
+
+
+adonis(t(as.data.frame(physeq_poopwater2@otu_table))~Fish_type,data=as.data.frame(as.matrix(physeq_poopwater2@sam_data)),method = "bray") 
+
+adonis(t(as.data.frame(physeq_poopwater2@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_poopwater2@sam_data)),method = "bray")
+
+#Based on water condition
+#Low
+physeq_poopwater3 <-  subset_samples(physeq_poopwater, Water.condition=="low")
+physeq_poopwater3 <- prune_taxa(taxa_sums(physeq_poopwater3)>0,physeq_poopwater3)
+
+adonis(t(as.data.frame(physeq_poopwater3@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_poopwater3@sam_data)),method = "bray")
+
+#High
+physeq_poopwater4 <-  subset_samples(physeq_poopwater, Water.condition=="high")
+physeq_poopwater4 <- prune_taxa(taxa_sums(physeq_poopwater4)>0,physeq_poopwater4)
+
+adonis(t(as.data.frame(physeq_poopwater4@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_poopwater4@sam_data)),method = "bray")
+#Medium
+physeq_poopwater5 <-  subset_samples(physeq_poopwater, Water.condition=="medium")
+physeq_poopwater5 <- prune_taxa(taxa_sums(physeq_poopwater5)>0,physeq_poopwater5)
+
+adonis(t(as.data.frame(physeq_poopwater5@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_poopwater5@sam_data)),method = "bray")
+
+
+
+#Gut and water
+physeq_gutwater <-  subset_samples(physeq_enviro, Sample_type %in% c("water","gut"))
+#physeq_gutwater <-  subset_samples(physeq_gutwater, Batch=="2")
+physeq_gutwater <- prune_taxa(taxa_sums(physeq_gutwater)>0,physeq_gutwater)
+
+ordi_gutwater_wuni <- ordinate(physeq_gutwater, method = "PCoA","unifrac",weighted= TRUE)
+ordi_gutwater_uni <- ordinate(physeq_gutwater, method = "PCoA","unifrac",weighted= FALSE)
+
+p1 = plot_ordination(physeq_gutwater, ordi_gutwater_wuni, type="Samples",
+                     color="Sample_type",shape="Water.condition",
+                     title="") 
+pordi_gutwater_wuni = p1+ geom_point(size = 5) + theme_minimal() + labs(subtitle = "") +  theme(legend.position = "bottom",legend.box = "vertical",title = element_text(size=20),legend.title = element_text(size=15),legend.text = element_text(size = 15,face="bold")) +
+    scale_fill_manual(values=c("red","blue")) + 
+  scale_color_manual(values=c("red","blue"),name="",labels=c("Gut","Water")) + 
+  scale_shape_discrete(name="Amount of faeces in water",labels=c("Low","High","Medium"))
+
+
+#PERMANOVA Overall
+
+adonis(t(as.data.frame(physeq_gutwater@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_gutwater@sam_data)),method = "bray")
+
+groups <- as.data.frame(as.matrix(physeq_gutwater@sam_data))
+unifrac.dist_water <- UniFrac(physeq_gutwater, weighted = TRUE)
+betadis <- betadisper(unifrac.dist_water,group = groups$Sample_type)
+anova(betadis)
+TukeyHSD(betadis)
+
+#PERMANOVA based on sequencing run
+
+physeq_gutwater2 <-  subset_samples(physeq_enviro, Sample_type %in% c("water","gut"))
+physeq_gutwater2 <-  subset_samples(physeq_gutwater2, Batch=="2")
+physeq_gutwater2 <- prune_taxa(taxa_sums(physeq_gutwater2)>0,physeq_gutwater2)
+
+adonis(t(as.data.frame(physeq_gutwater2@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_gutwater2@sam_data)),method = "bray")
+
+
+#tail fin and skin swabs
+physeq_skinwater <-  subset_samples(physeq_enviro, Sample_type %in% c("water","tail_fin","skin_swab"))
+#physeq_skinwater <- subset_samples(physeq_skinwater, Water.condition != "low")
+physeq_skinwater <- subset_samples(physeq_skinwater,!demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020")) #the 7 outliers with only Escherichia in them. 
+physeq_skinwater <- prune_taxa(taxa_sums(physeq_skinwater)>0,physeq_skinwater)
+
+ordi_skinwater_wuni <- ordinate(physeq_skinwater, method = "PCoA","unifrac",weighted= TRUE)
+ordi_skinwater_uni <- ordinate(physeq_skinwater, method = "PCoA","unifrac",weighted= FALSE)
+
+p1 = plot_ordination(physeq_skinwater, ordi_skinwater_wuni, type="Samples",
+                     color="Sample_type", shape="Water.condition",
+                     title="") 
+pordi_skinwater_wuni = p1+ geom_point(size = 5) + theme_minimal() + labs(subtitle = "") +  theme(legend.position = "bottom",legend.box = "vertical",title = element_text(size=20),legend.text = element_text(size = 15,face="bold")) +
+    scale_fill_manual(values=c("gold","darkorange","blue")) + 
+  scale_color_manual(values=c("gold","darkorange","blue"),name="",labels=c("Skin swab","Tail fin","water")) + 
+  scale_shape_discrete(element_blank(),element_blank())
+
+#merged plot
+pordi_poopwater_wuni + pordi_gutwater_wuni + pordi_skinwater_wuni + plot_layout(guides = "auto") + plot_annotation(tag_levels = "A",title = "PCoA",subtitle = "Weighted UniFrac") & theme(legend.position = "bottom",title=element_text(size=20))
+
+#PERMANOVA for the whole batch of skin samples
+
+adonis(t(as.data.frame(physeq_skinwater@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_skinwater@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_skinwater@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_skinwater@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_skinwater@sam_data)),method = "bray")
+
+#PERMANOVA for the skin swabs and water only
+#in total
+physeq_swabwater <-  subset_samples(physeq_enviro, Sample_type %in% c("water","skin_swab"))
+physeq_swabwater <- prune_taxa(taxa_sums(physeq_swabwater)>0,physeq_swabwater)
+
+adonis(t(as.data.frame(physeq_swabwater@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_swabwater@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_swabwater@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_swabwater@sam_data)),method = "bray")
+adonis(t(as.data.frame(physeq_swabwater@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_swabwater@sam_data)),method = "bray")
+
+#And based only on batch 2 (that is the water samples and skin swabs which belong to batch 2)
+
+physeq_swabwater2 <-  subset_samples(physeq_enviro, Sample_type %in% c("water","skin_swab"))
+physeq_swabwater2 <-  subset_samples(physeq_swabwater2, Batch=="2")
+physeq_swabwater2 <- prune_taxa(taxa_sums(physeq_swabwater2)>0,physeq_swabwater2)
+
+adonis(t(as.data.frame(physeq_swabwater2@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_swabwater2@sam_data)),method = "bray")
+
+#PERMANOVA for the tail fin samples
+
+physeq_skinwater1 <-  subset_samples(physeq_enviro, Sample_type %in% c("water","tail_fin"))
+physeq_skinwater1 <- subset_samples(physeq_skinwater1,!demultiplexing_ID %in% c("Mo-006","Mo-010","WT-012","WT-014","WT-016","WT-017","WT-020")) #the 7 outliers with only Escherichia in them. 
+physeq_skinwater1 <- prune_taxa(taxa_sums(physeq_skinwater1)>0,physeq_skinwater1)
+
+adonis(t(as.data.frame(physeq_skinwater1@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_skinwater1@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_skinwater1@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater1@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_skinwater1@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_skinwater1@sam_data)),method = "bray")
+
+#PERMANOVA of only the tail fin and water samples taken at the same tme
+
+physeq_skinwater2 <- subset_samples(physeq_skinwater1, Water.condition != "low")
+physeq_skinwater2 <- prune_taxa(taxa_sums(physeq_skinwater2)>0,physeq_skinwater2)
+
+adonis(t(as.data.frame(physeq_skinwater2@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_skinwater2@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_skinwater2@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater2@sam_data)),method = "bray")
+
+adonis(t(as.data.frame(physeq_skinwater2@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_skinwater2@sam_data)),method = "bray")
+
+#Only batch 1 of tail fin and water samples to see if the sample_type difference is because of the batch difference
+
+physeq_skinwater3 <- subset_samples(physeq_skinwater2, Batch == 1 )
+physeq_skinwater3 <- prune_taxa(taxa_sums(physeq_skinwater3)>0,physeq_skinwater3)
+
+adonis(t(as.data.frame(physeq_skinwater3@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater3@sam_data)),method = "bray")
+
+#Only for batch 2
+
+physeq_skinwater4 <- subset_samples(physeq_skinwater2, Batch == 2 )
+physeq_skinwater4 <- prune_taxa(taxa_sums(physeq_skinwater4)>0,physeq_skinwater4)
+
+adonis(t(as.data.frame(physeq_skinwater4@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater4@sam_data)),method = "bray")
+
+#And the same but witht the low for batch 1
+physeq_skinwater5 <- subset_samples(physeq_skinwater1, Batch == 1 )
+physeq_skinwater5 <- prune_taxa(taxa_sums(physeq_skinwater5)>0,physeq_skinwater5)
+
+adonis(t(as.data.frame(physeq_skinwater5@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater5@sam_data)),method = "bray")
+#And finally for batch 2
+physeq_skinwater6 <- subset_samples(physeq_skinwater1, Batch == 2 )
+physeq_skinwater6 <- prune_taxa(taxa_sums(physeq_skinwater6)>0,physeq_skinwater6)
+
+adonis(t(as.data.frame(physeq_skinwater6@otu_table))~Sample_type,data=as.data.frame(as.matrix(physeq_skinwater6@sam_data)),method = "bray")
+
+#So in summary, the tail fin clips are significantly different from the water samples, this significance is driven by batch 1 and is not significant for batch 2.
+
+#The skin swab samples are significanty different from the total amount of water samples, but not from the batch which it belongs to. 
