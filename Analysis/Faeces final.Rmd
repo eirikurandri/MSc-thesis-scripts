@@ -25,7 +25,7 @@ library(patchwork)
 library(ggpubr)
 library(rstatix)
 
-
+#We use the ASV table which resulted from the harsher cutoff in Decontam and processing through LULU for curating the ASV table.
 ASVs_deconprev_harsh <- read.csv("Curated_Table_CRISPR_deconprev_harsh.txt", sep = ",")
 tax_deconprev_harsh <- read.csv("Curated_Tax_CRISPR_deconprev_harsh.csv", sep = ",")
 md <- read.csv("metadata_complete.csv", sep = ",",stringsAsFactors = TRUE)
@@ -36,24 +36,25 @@ rownames(md)<-md$demultiplexing_ID
 rownames(tax_deconprev_harsh) <- rownames(ASVs_deconprev_harsh)
 colnames(ASVs_deconprev_harsh)<-rownames(md)
 
+Define some pallettes
 ugly<- c("#C15444","#C1B244","#26736A","#C17A44","#2D8652","#2E428A","#A83861","#BEE0E9","#D4C57D","#4D3619","#883091","#B3B4E6","#CDCF6E","#6ECFA8","#1F1F1F","#5E5E5E","#0E220B","#CD936A","#62CB8C","#C65353","#C6BA53","#4FB3C4","#8FC757","#6B4424","#EC453C","#F4A590","#D6F7AB","#78F297", "#310E8B","#EA462A")
 
-#This one is more bright but childish
 childish <- c("#B71C1C","#FFC107","#A7FFEB","#FFB74D","#757575","#FF5252","#BA68C8","#8BC34A","#F57F17","#009688","#FF80AB","#304FFE","#455A64","#69F0AE","#FF5722","#9C640C","#F1C40F","#A93226","#76448A","#17A589","#C6BA53","#4FB3C4","#8FC757","#6B4424","#EC453C","#F4A590","#D6F7AB","#78F297", "#310E8B","#EA462A")
 
-#make the phyloseq object to use
+#make the phyloseq object
 physeq_a<- phyloseq(otu_table(ASVs_deconprev_harsh,taxa_are_rows=TRUE),
                    tax_table(as.matrix(tax_deconprev_harsh)),
                    sample_data(md))
 
-
 #merge_taxa
 physeq = tax_glom(physeq_a, "Genus")
 
-## Create tree for physeq to use unifrac distances for ordination
+## Create tree
 random_tree = rtree(ntaxa(physeq), rooted=TRUE, tip.label=taxa_names(physeq))
+
 #merge the tree to the physeq object
 physeq = merge_phyloseq(physeq, random_tree)
+
 #Generate sample based relative abundace (and filter low occuring ASVs)
 physeq_filt = prune_samples(sample_sums(physeq) >= 100, physeq)
 
@@ -78,13 +79,13 @@ f_richness <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=0,posthoc = TRU
 f_Shannon <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=1,posthoc = TRUE)
 f_Simpson <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=2,posthoc = TRUE)
 
-#extract the data so you can access it at will
+#extract the data so it can be accessed at will
 
 richness_vals_f <- f_richness$data
 Shannon_vals_f <-  f_Shannon$data
 Simpson_vals_f <- f_Simpson$data
 
-#double check with wilcoxon rank sum test
+#wilcox test
 wilcox.test(richness_vals_f,formula = Value~Group)
 wilcox.test(Shannon_vals_f,formula = Value~Group)
 wilcox.test(Simpson_vals_f,formula = Value~Group)
@@ -99,7 +100,6 @@ physeq_faeces <- subset_samples(physeq_a,Sample_type=="faeces")
 physeq_faeces <- subset_samples(physeq_faeces,experi=="Tyr")
 physeq_faeces <- prune_taxa(taxa_sums(physeq_faeces)>0,physeq_faeces)
 
-
 ASVtab_faeces <- as.data.frame(physeq_faeces@otu_table)
 sample_groups <- as.data.frame(as.matrix(physeq_faeces@sam_data))
 sample_groups <- as.data.frame(sample_groups[,c(2,6)])
@@ -108,12 +108,13 @@ f_richness <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=0,posthoc = TRU
 f_Shannon <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=1,posthoc = TRUE)
 f_Simpson <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=2,posthoc = TRUE)
 
-#extract the data so you can access it at will
+#extract the data so it can be accessed at will
 
 richness_vals_f <- f_richness$data
 Shannon_vals_f <-  f_Shannon$data
 Simpson_vals_f <- f_Simpson$data
 
+#wilcox test
 wilcox_test(richness_vals_f,formula = Value~Group)
 wilcox_test(Shannon_vals_f,formula = Value~Group)
 wilcox_test(Simpson_vals_f,formula = Value~Group)
@@ -132,6 +133,7 @@ physeq_faeces <- subset_samples(physeq_norm,Sample_type=="faeces")
 physeq_faeces <- subset_samples(physeq_faeces,experi=="Tyr")
 physeq_faeces <- prune_taxa(taxa_sums(physeq_faeces)>0,physeq_faeces)
 
+#create physeq objects for each phenotype just in case its needed
 physeq_wt <- subset_samples(physeq_faeces,Fish_type=="WT")
 physeq_al <- subset_samples(physeq_faeces,Fish_type=="Albino")
 physeq_mo <- subset_samples(physeq_faeces,Fish_type=="Mosaic")
@@ -151,6 +153,7 @@ generalist <- generalist %>%
 
 write.table(generalist,"generalist.tsv",sep="\t", quote=F, col.names=NA)
 
+#plot time
 par(mar = c(10, 4, 4, 2) + 0.1) # make more room on bottom margin
 N <- 30
 
@@ -158,13 +161,13 @@ N <- 30
 barplot(sort(taxa_sums(physeq_faeces), TRUE)[1:N]/nsamples(physeq_faeces), las=2,col="#9C640C")+ title(main="Cumulative fractional abundance of top 30 ASV's in the faeces samples",ylab = "Fractional abundance") 
 #dev.off()
 
-
+#Cumulative relative abundance accross fecal samples
 #Cetobacterium
 sort(taxa_sums(physeq_faeces), TRUE)[1]/nsamples(physeq_faeces)
 #Aeromonas
 sort(taxa_sums(physeq_faeces), TRUE)[2]/nsamples(physeq_faeces)
 
-#selecting top30 ASV's
+#selecting top30 genera
 TopNOTUs = names(sort(taxa_sums(physeq_faeces), TRUE)[1:20])
 physeq_30_f = prune_taxa(TopNOTUs, physeq_faeces)
 
@@ -227,6 +230,7 @@ faeces_abundance <- physeq_faeces_final_Genus + plot_genus_ab_f + plot_layout(gu
 ```
 metacoder
 ```{r}
+#preprocessing to make the metacoder plot
 metacoder <- parse_phyloseq(physeq_faeces)
 metacoder$data$tax_abund <- calc_taxon_abund(metacoder, data = "otu_table") # fine
 metacoder$data$tax_occ <- calc_n_samples(metacoder, "tax_abund", groups = "Fish_type")
@@ -238,6 +242,7 @@ metacoder$data$diff_table$adjusted_p_value <- p.adjust(metacoder$data$diff_table
 View(metacoder$data$diff_table)
 metacoder$data$diff_table$log2_median_ratio[metacoder$data$diff_table$wilcox_p_value > 0.05] <- 0 # added
 
+#metacoder plot time
 metacoder.plot <- heat_tree_matrix(metacoder,
                                    data = "diff_table",
                             node_size = n_obs,
@@ -258,6 +263,7 @@ pdf("Compare_faeces_types.pdf", width = 20, height = 20)
 metacoder.plot # for ewos green more abundant in gut, no enrichment of mycoplasma so it must also be abundant in the feed # bremeia is more abudant in the gut
 dev.off()
 
+#Show the taxon_IDs of the genera which differentiated significantly among the pigmentation phenotypes
 significant_taxa<- metacoder$data$diff_table %>%
   mutate(taxon_names = taxon_names(metacoder)[taxon_id], 
          taxon_ranks = taxon_ranks(metacoder)[taxon_id]) %>%
@@ -307,7 +313,7 @@ dev.off()
 ```
 
 ```{r}
-#Boxplots
+#Boxplots (including stats) showing the significant differences of the significantly different genera which constitute more than 1% of the cumulative relative abundance. These are Cetobacterium, Aeromonas, Vibrio and Pseudomonas.
 
 Fish_types <- as.data.frame(as.matrix(physeq_faeces@sam_data$Fish_type))
 #Cetobacterium abundance
@@ -327,7 +333,7 @@ Pseduomonas <- t(Pseduomonas)
 final <- cbind(Cetobacterium,Aeromonas,Vibrio,Pseduomonas,Fish_types)
 
 #Cetobacterium
-#Stat_test for plot
+#Stat_tests for including in the plots. 
 cet <- compare_means(ASV_1~V1,data=final,method = "wilcox.test",p.adjust.method = "BH",hide.ns=TRUE) %>% add_significance("p.adj")  %>% add_xy_position(formula=ASV_1~V1,data=final,dodge = 0.8)
 #plot
 Ceto <- ggboxplot(final, x="V1",y="ASV_1",fill = childish[1:3])+labs(x="",y="Relative abundance") + stat_pvalue_manual(cet,label = "p.adj.signif",hide.ns = TRUE) + labs(title = "Cetobacterium") + theme(title = element_text(face = "italic"),axis.title.y = element_text(face = "plain"))
@@ -350,13 +356,15 @@ Ps <- ggboxplot(final, x="V1",y="ASV_13",fill = childish[1:3])+labs(x="",y="Rela
 
 taxas <- (Ceto + Aero) / (Vib + Ps) + plot_annotation(tag_levels = "A",title="Significant taxa") & theme(title = element_text(size=20))
 ```
-Beta diversities
+Beta diversities (ordinations)
 ```{r}
+
+#_Weighted and unweighted UniFrac ordinations
 ordipoo_wuni <- ordinate(physeq_faeces,"PCoA","unifrac",weighted=TRUE)
 ordipoo_ununi <- ordinate(physeq_faeces,"PCoA","unifrac",weighted=FALSE)
-ordipoo_bray <- ordinate(physeq_faeces,"PCoA","bray")
-ordipoo_jaccard <- ordinate(physeq_faeces,"PCoA","jaccard")
 
+#plot the ordinations
+#weighted UniFrac
 p1 = plot_ordination(physeq_faeces, ordipoo_wuni, type="Samples",
                      color="Fish_type", shape = "Batch",
                      title="PCoA")
@@ -366,7 +374,8 @@ pordi_poo_wuni = p1+ geom_point(size = 5) +
     scale_fill_manual(values=childish) + 
   scale_color_manual(values=childish,name="Pigmentation phenotype")+
   scale_shape_discrete(name="Sequencing run")
-
+  
+#unweighted UniFrac
 p1 = plot_ordination(physeq_faeces, ordipoo_ununi, type="Samples",
                      color="Fish_type", shape = "Batch",
                      title="PCoA")
@@ -381,25 +390,3 @@ pordi_poo_uni = p1+ geom_point(size = 5) +
 adonis(t(as.data.frame(physeq_faeces@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
 adonis(t(as.data.frame(physeq_faeces@otu_table))~Fish_type,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
 adonis(t(as.data.frame(physeq_faeces@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
-
-#add the significant taxa to the picture and do adonis again
-
-physeq_faeces@sam_data$Ceto <- as.numeric(t(physeq_faeces@otu_table["ASV_1"]))
-physeq_faeces@sam_data$Aero <- t(physeq_faeces@otu_table["ASV_3"])
-physeq_faeces@sam_data$Vibrio <- t(physeq_faeces@otu_table["ASV_24"])
-physeq_faeces@sam_data$Pseudo <- t(physeq_faeces@otu_table["ASV_13"])
-
-#contributions of individual taxa
-p <- t(as.data.frame(physeq_faeces@otu_table))
-d <- as.data.frame(as.matrix(physeq_faeces@sam_data))
-d$Ceto <- as.numeric(d$Ceto)
-d$Aero <- as.numeric(d$Aero)
-d$Vibrio <- as.numeric(d$Vibrio)
-d$Pseudo <- as.numeric(d$Pseudo)
-#How much of the observed difference can be attributed to each genus.
-adonis(p~Ceto,data=d,method="jaccard")
-adonis(p~Aero,data=d,method="jaccard")
-adonis(p~Vibrio,data=d,method="jaccard")
-adonis(p~Pseudo,data=d,method="jaccard")
-
-
