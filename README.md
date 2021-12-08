@@ -1,4 +1,3 @@
-# MSc-thesis-scripts
 This repository contains the scripts for the processing of the 16S data relevant to the paper: "ZEBRAFISH AND CRISPR/CAS: A MODEL TO ELUCIDATE HOST GENETIC EFFECTS ON THE MICROBIOTA". 
 They are split into two sections. 
 The first section is Pre-processing, which is the bioinformatic preprocessing of sequences from the demultiplexed sequences to the curated ASV table. 
