@@ -386,7 +386,6 @@ pordi_poo_uni = p1+ geom_point(size = 5) +
   scale_color_manual(values=childish,name="Pigmentation phenotype")+
   scale_shape_discrete(name="Sequencing run")
 
+#PERMANOVA using Bray-Curtis
+adonis(t(as.data.frame(physeq_faeces@otu_table))~Fish_type*Batch,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
 
-adonis(t(as.data.frame(physeq_faeces@otu_table))~Batch,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
-adonis(t(as.data.frame(physeq_faeces@otu_table))~Fish_type,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
-adonis(t(as.data.frame(physeq_faeces@otu_table))~Water.condition,data=as.data.frame(as.matrix(physeq_faeces@sam_data)),method="bray")
