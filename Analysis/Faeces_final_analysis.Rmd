@@ -79,17 +79,6 @@ f_richness <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=0,posthoc = TRU
 f_Shannon <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=1,posthoc = TRUE)
 f_Simpson <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=2,posthoc = TRUE)
 
-#extract the data so it can be accessed at will
-
-richness_vals_f <- f_richness$data
-Shannon_vals_f <-  f_Shannon$data
-Simpson_vals_f <- f_Simpson$data
-
-#wilcox test
-wilcox.test(richness_vals_f,formula = Value~Group)
-wilcox.test(Shannon_vals_f,formula = Value~Group)
-wilcox.test(Simpson_vals_f,formula = Value~Group)
-
 #plot the alpha diversities
 div_test_plot(f_richness,posthoc=TRUE,threshold=0.05,col=childish)
 div_test_plot(f_Shannon,posthoc=TRUE,threshold=0.05,col=childish)
@@ -107,17 +96,6 @@ sample_groups <- as.data.frame(sample_groups[,c(2,6)])
 f_richness <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=0,posthoc = TRUE)
 f_Shannon <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=1,posthoc = TRUE)
 f_Simpson <- div_test(ASVtab_faeces,hierarchy = sample_groups,q=2,posthoc = TRUE)
-
-#extract the data so it can be accessed at will
-
-richness_vals_f <- f_richness$data
-Shannon_vals_f <-  f_Shannon$data
-Simpson_vals_f <- f_Simpson$data
-
-#wilcox test
-wilcox_test(richness_vals_f,formula = Value~Group)
-wilcox_test(Shannon_vals_f,formula = Value~Group)
-wilcox_test(Simpson_vals_f,formula = Value~Group)
 
 #plot the alpha diversities
 div_test_plot(f_richness,posthoc=TRUE,threshold=0.05,col=childish)
