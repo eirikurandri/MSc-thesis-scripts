@@ -235,10 +235,8 @@ metacoder.plot <- heat_tree_matrix(metacoder,
                             initial_layout = "reingold-tilford", # The layout algorithm that initializes node locations
                             node_size_axis_label = "Number of ASVs",
                             node_color_axis_label = "Log2 ratio median proportions") 
-
-#tiff("metacoder_plot1_BioMar.tiff", units="in", width=10, height=5, res=300)
 pdf("Compare_faeces_types.pdf", width = 20, height = 20)
-metacoder.plot # for ewos green more abundant in gut, no enrichment of mycoplasma so it must also be abundant in the feed # bremeia is more abudant in the gut
+metacoder.plot
 dev.off()
 
 #Show the taxon_IDs of the genera which differentiated significantly among the pigmentation phenotypes
